@@ -13,24 +13,6 @@ public interface ImageProcessor extends ExtensionPoint {
         implement this interface using the @Extension annotation.
      */
 
-    String getMetadata(File file);
+    // String getMetadata(File file);
+    String getMetadata();
 }
-
-
-
-/*
-        try {
-            File tiffFile = new File("src/images/sample.tif");
-
-            GeoTiffReader reader;
-            reader = new GeoTiffReader(tiffFile);
-
-            GeoTiffIIOMetadataDecoder metadata = reader.getMetadata();
-            IIOMetadataNode mdNode = metadata.getRootNode();
-            IIOMetadataDumper mdDump = new IIOMetadataDumper(mdNode);
-
-            System.out.println(mdDump.getMetadata());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
- */
