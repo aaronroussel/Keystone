@@ -33,7 +33,14 @@ https://gdal.org/en/stable/api/java/index.html
 
 I would advise to pipe your output from the final stage of the build process into a text file. The output will display
 the installation locations for all of GDAL. These locations will be useful when setting up PATH environment variables
-on your system.
+on your system. You can do this by using ">" after the cmake command and enter a file name if the file is in the same directory or the full path
+to the file if it is in another directory.
+
+ex: 'cmake --build . --target install > output.txt
+
+this will not show any output in the terminal, if you want to also see the output in the console look into how the "tee" terminal command works.
+
+
 
 You will need to add the path to the wherever your libgdal.so (libgdal.dll on windows) folder, which contains library files for gdal, to your system
 LD_LIBRARY_PATH (PATH on windows). There are both temporary and permanent ways to do this, and we want the permanent
