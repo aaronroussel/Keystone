@@ -29,13 +29,14 @@ Additional requirements to run the GDAL test suite are:
 
 more info on building from source can be found here:
 https://gdal.org/en/stable/development/building_from_source.html
+https://gdal.org/en/stable/api/java/index.html
 
 I would advise to pipe your output from the final stage of the build process into a text file. The output will display
 the installation locations for all of GDAL. These locations will be useful when setting up PATH environment variables
 on your system.
 
 You will need to add the path to the wherever your libgdal.so (libgdal.dll on windows) folder, which contains library files for gdal, to your system
-LD_LIBRARY_PATH (this may be named differently on windows). There are both temporary and permanent ways to do this, and we want the permanent
+LD_LIBRARY_PATH (PATH on windows). There are both temporary and permanent ways to do this, and we want the permanent
 option. How to do this will vary depending on operating system.
 
 Then add the following as VM arguments in your build options in intellij:
