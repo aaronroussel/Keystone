@@ -47,6 +47,7 @@ to the file if it is in another directory.
 ex: 'cmake --build . --target install > output.txt
 
 this will not show any output in the terminal, if you want to also see the output in the console look into how the "tee" terminal command works.
+you can also just choose to leave your terminal window open until you get things working properly.
 
 
 
@@ -57,7 +58,11 @@ option. How to do this will vary depending on operating system.
 Then add the following as VM arguments in your build options in intellij:
  -Djava.library.path={path to jni folder}
 
-This will tell the JVM instance where to look for the java bindings
+If this does not work, you may also need to add this to the build configuration. open the build config and in the box labeled: "Environment Variables" add:
+
+PATH={path to libgdal.dll):$PATH
+
+
 
 
 
