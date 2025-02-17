@@ -31,6 +31,14 @@ more info on building from source can be found here:
 https://gdal.org/en/stable/development/building_from_source.html
 https://gdal.org/en/stable/api/java/index.html
 
+for the first cmake command we want to specify that we would like to build the java bindings. this is set to "ON" by default but if we explicity
+specify this option then cmake should tell us if we are missing any dependencies and abort if that is the case. Otherwise it would continue with
+the build if we are missing dependencies for the java bindings, and just build without java bindings.
+
+ex: "cmake .. -DBUILD_JAVA_BINDINGS=ON"             ------>   the leading "D" here is important. forgetting to begin build configs with this will cause issues
+
+
+
 I would advise to pipe your output from the final stage of the build process into a text file. The output will display
 the installation locations for all of GDAL. These locations will be useful when setting up PATH environment variables
 on your system. You can do this by using ">" after the cmake command and enter a file name if the file is in the same directory or the full path
