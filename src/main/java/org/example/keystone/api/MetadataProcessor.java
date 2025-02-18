@@ -2,9 +2,9 @@ package org.example.keystone.api;
 
 import org.pf4j.ExtensionPoint;
 
-import java.io.File;
+import java.util.Vector;
 
-public interface ImageProcessor extends ExtensionPoint {
+public interface MetadataProcessor extends ExtensionPoint {
 
     /*
         This is an interface that will serve as an extension point for plugins that assist in Image Processing.
@@ -12,7 +12,9 @@ public interface ImageProcessor extends ExtensionPoint {
         The ExtensionPoint class extended by this interface is a class provided by PF4J that allows plugins to
         implement this interface using the @Extension annotation.
      */
+    Vector<String> getPrivateMetadata();
 
-    // String getMetadata(File file);
-    String getMetadata();
+    Vector<String> getMetadataDomains();
+
+
 }
