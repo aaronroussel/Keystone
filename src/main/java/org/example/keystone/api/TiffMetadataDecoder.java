@@ -8,6 +8,9 @@ import org.geotools.gce.geotiff.GeoTiffReader;
 
 import javax.imageio.metadata.IIOMetadataNode;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 public class TiffMetadataDecoder implements MetadataProcessor {
@@ -44,11 +47,6 @@ public class TiffMetadataDecoder implements MetadataProcessor {
 
     public Vector<String> getPrivateMetadata() {
 
-        if (this.dataset == null) {
-            System.err.println("Error: Could not open dataset " + this.tiffFile.getPath());
-            System.exit(1);
-        }
-
         // Retrieve metadata. we can input a string to retrieve the value for a specific domain.
         // ex dataset.GetMetadata_List("AREA_OR_POINT")
         // if no input is provided, the function will return only metadata contained in the default domain
@@ -74,6 +72,23 @@ public class TiffMetadataDecoder implements MetadataProcessor {
         }
 
         return metadataList;
+    }
+
+    public Vector<String> getPrivateMetadata(String domain) {
+
+        // use this function if you need to return metadata only for a specific domain
+
+        Vector<String> metadataList = new Vector<>();
+
+        Vector rawMetadata = this.dataset.GetMetadata_List(domain);
+        if (rawMetadata != null) {
+            for (Object object : rawMetadata) {
+                metadataList.add(object.toString());
+            }
+        }
+
+        return metadataList;
+
     }
 
     private Dataset getDataset() {
@@ -102,6 +117,22 @@ public class TiffMetadataDecoder implements MetadataProcessor {
         }
 
         return null;
+    }
+
+    public Hashtable<String, String> getMetadataHashTable() {
+
+        // returns a hashtable of key value pairs for all metadata in the specified domain. GetMetadta_Dict() works
+        // the same as other GDAL metadata functions. a string input tells which metadata domain to fetch the data
+        // from, and if no domain is specified (or any empty string is used) then the function will return the metadata
+        // in the default domain.
+        Hashtable rawMetadataTable = this.dataset.GetMetadata_Dict();
+        Hashtable<String, String> metadataTable = new Hashtable<String, String>();
+        for (Object keyObject : rawMetadataTable.keySet()) {
+            Object valueObject = rawMetadataTable.get(keyObject);
+            metadataTable.put(keyObject.toString(), valueObject.toString());
+        }
+
+        return metadataTable;
     }
 
     public boolean hasDataset() {
