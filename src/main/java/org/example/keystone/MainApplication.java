@@ -27,7 +27,8 @@ public class MainApplication extends Application {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
         // ------------ GDAl -----------------
-        // File file = new File("src/images/sample.tif");
+        //File file = new File("src/images/sample.tif");
+        //TiffMetadataDecoder tiffMetadataDecoder = new TiffMetadataDecoder(file);
         // ----------- Init UI -----------
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("hello-view.fxml")); // load fxml file
         Scene scene = new Scene(fxmlLoader.load(), 320, 240); // create new scene with loaded fxml
