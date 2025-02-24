@@ -48,6 +48,10 @@ public class MainApplicationController implements Initializable {
             if (files != null) {
                for (File file : files) {
                    Text fileNameText = new Text(file.getName());
+                   fileNameText.setOnMouseClicked(event -> {
+                       // here we need to add some logic to fetch the metadata for the file and send it to be displayed
+                       // by another UI component
+                   });
                    fileVBox.getChildren().add(fileNameText);
                }
             }
