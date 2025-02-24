@@ -12,9 +12,9 @@ public interface MetadataProcessor extends ExtensionPoint {
         The ExtensionPoint class extended by this interface is a class provided by PF4J that allows plugins to
         implement this interface using the @Extension annotation.
      */
-    Vector<String> getPrivateMetadata();
+    //Vector<String> getPrivateMetadata();
 
-    Vector<String> getMetadataDomains();
+    //Vector<String> getMetadataDomains();
 
 
 }

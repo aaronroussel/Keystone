@@ -13,6 +13,7 @@ module org.example.keystone {
     requires org.slf4j;
     requires gdal;
     requires org.geotools.api;
+    requires org.geotools.metadata;
 
     opens org.example.keystone to javafx.fxml;
     exports org.example.keystone;
