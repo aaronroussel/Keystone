@@ -196,11 +196,21 @@ public abstract class MetadataDecoder {
         System.out.println(metadata);
     }
 
+    /*
+        below are abstract function declarations for writing metadata. How we write metadata and how we enforce
+        naming conventions will differ for each file type, so we only define an abstract definition here and then
+        implement the concrete function in the decoder classes that extend this abstract class
+     */
+
     public abstract void setSpatialReferenceFromWKT(String wktString);
 
     public abstract void setMetadataField(String key, String value);
 
     public abstract void setMetadataField(String key, String value, String domain);
+
+    public abstract void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable);
+
+    public abstract void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable, String domain);
 
     public boolean hasDataset() {
         return this.dataset != null;

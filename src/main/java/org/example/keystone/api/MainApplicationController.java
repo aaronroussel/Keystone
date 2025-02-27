@@ -21,8 +21,6 @@ public class MainApplicationController implements Initializable {
 
         If using scenebuilder, you must set the fx:id to a unique value, then create a corresponding variable here with matching type
         and name. This can also be specified directly in the fxml file.
-
-
      */
     @FXML
     private Label welcomeText;

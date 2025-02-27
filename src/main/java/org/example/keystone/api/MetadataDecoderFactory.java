@@ -4,6 +4,10 @@ import java.io.File;
 
 public class MetadataDecoderFactory {
     public static MetadataDecoder createDecoder(File file) {
+
+        /*
+            Factory class for creating new MetadataDecoder objects based on file type
+         */
         String fileType = getFileExtension(file);
 
         if (fileType == null) {
@@ -20,6 +24,7 @@ public class MetadataDecoderFactory {
     }
 
     public static String getFileExtension(File file) {
+        // takes in a File object and parses the file name to obtain the file extension
         String fileName = file.getName();
         int lastDotIndex = fileName.lastIndexOf('.');
 
