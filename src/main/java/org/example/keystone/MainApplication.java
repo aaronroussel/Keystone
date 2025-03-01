@@ -8,10 +8,15 @@ import javafx.stage.Stage;
 import org.example.keystone.api.MetadataDecoder;
 import org.example.keystone.api.MetadataDecoderFactory;
 import org.example.keystone.api.TiffDecoder;
+import org.gdal.gdal.XMLNode;
+import org.gdal.gdal.XMLNodeType;
+import org.gdal.gdal.gdal;
+import org.gdal.ogr.ogr;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.PluginManager;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -24,14 +29,20 @@ public class MainApplication extends Application {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
         // ------------ GDAl -----------------
-        //File file = new File("src/images/sample.tif");
+        File file = new File("src/images/sample.tif");
         //File file = new File("src/images/sample.tif");
         //MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
         //assert metadataDecoder != null;
+        //String xmlString = metadataDecoder.getSpatialReferenceXML();
+        //ogr.CreateGeometryFromGML(xmlString);
+        //System.out.println(xmlString);
+        //System.out.println("\n\n\n---------------------------------------------------------------------");
+
+
         // ----------- Init UI -----------
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("hello-view.fxml")); // load fxml file
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240); // create new scene with loaded fxml
-        stage.setTitle("Hello!");
+        Scene scene = new Scene(fxmlLoader.load(), 1920, 1080); // create new scene with loaded fxml
+        stage.setTitle("Keystone");
         stage.setScene(scene);
         stage.show(); // display scene
     }

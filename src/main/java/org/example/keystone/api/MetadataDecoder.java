@@ -171,6 +171,11 @@ public abstract class MetadataDecoder {
         return spatialString;
     }
 
+    public String getSpatialReferenceXML() {
+        SpatialReference spatialReference = getSpatialReference();
+        return spatialReference.ExportToXML();
+    }
+
     public String getAllMetadataJSON() {
 
         /*
