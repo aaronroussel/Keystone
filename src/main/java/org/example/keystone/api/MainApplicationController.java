@@ -5,11 +5,16 @@ import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.input.MouseEvent;
+import javafx.util.StringConverter;
 import org.gdal.gdal.XMLNode;
 import org.gdal.gdal.gdal;
 
+
+import java.beans.EventHandler;
 import java.io.File;
 import java.net.URL;
 import java.util.Enumeration;
@@ -20,16 +25,19 @@ import java.util.Vector;
 public class MainApplicationController implements Initializable {
 
     /*
-                This is the Main Application Controller
-
-                Here we can control the logic of our UI. @FXML annotated methods and variables are linked to the corresponding elements defined
-                in the UI's FXML file, allowing us to interact with our UI elements using java code.
-
-                If using scenebuilder, you must set the fx:id to a unique value, then create a corresponding variable here with matching type
-                and name. This can also be specified directly in the fxml file.
-             */
+                    This is the Main Application Controller
+    
+                    Here we can control the logic of our UI. @FXML annotated methods and variables are linked to the corresponding elements defined
+                    in the UI's FXML file, allowing us to interact with our UI elements using java code.
+    
+                    If using scenebuilder, you must set the fx:id to a unique value, then create a corresponding variable here with matching type
+                    and name. This can also be specified directly in the fxml file.
+                 */
     @FXML
     private Label welcomeText;
+
+    @FXML
+    public TreeView<File> fileDirectoryTreeView;
 
     @FXML
     private ScrollPane fileScrollPane;
@@ -58,21 +66,7 @@ public class MainApplicationController implements Initializable {
         String directoryPath = "src/images";
         File directory = new File(directoryPath);
 
-        if (directory.exists() && directory.isDirectory()) {
-            File[] files = directory.listFiles();
-            if (files != null) {
-               for (File file : files) {
-                   Text fileNameText = new Text(file.getName());
-                   fileNameText.setOnMouseClicked(event -> {
-                       // here we need to add some logic to fetch the metadata for the file and send it to be displayed
-                       // by another UI component
-                   });
-                   fileVBox.getChildren().add(fileNameText);
-               }
-            }
-        } else {
-            fileVBox.getChildren().add(new Text("Directory not found"));
-        }
+        populateFileDirectoryTreeView(directory);
 
         File file = new File("src/images/sample.tif");
         MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
@@ -136,6 +130,10 @@ public class MainApplicationController implements Initializable {
             nodeName = nodeName.substring(4);
         }
 
+        if (nodeName.equals("name")) {
+            nodeName = "EPSG";
+        }
+
 
         String nodePath = parentPath.isEmpty() ? nodeName : parentPath + "/" + nodeName;
 
@@ -179,6 +177,48 @@ public class MainApplicationController implements Initializable {
             vector.add(item);
         }
         return vector;
+    }
+
+    private void populateFileDirectoryTreeView(File directory) {
+        TreeItem<File> rootItem = new TreeItem<>(directory);
+        rootItem.setExpanded(true);
+
+        fileDirectoryTreeView.setRoot(rootItem);
+
+        fileDirectoryTreeView.setCellFactory(param -> {
+            TextFieldTreeCell<File> cell = new TextFieldTreeCell<>();
+            cell.setConverter(new StringConverter<File>() {
+                @Override
+                public String toString(File file) {
+                    return file == null ? "" : file.getName();
+                }
+
+                @Override
+                public File fromString(String s) {
+                    return null;
+                }
+            });
+            cell.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
+                System.out.println(cell.getText());
+            });
+            return cell;
+        });
+
+        createTree(directory, rootItem);
+    }
+
+    private void createTree(File dir, TreeItem<File> parentItem) {
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                TreeItem<File> childItem = new TreeItem<>(file);
+                parentItem.getChildren().add(childItem);
+
+                if (file.isDirectory()) {
+                    createTree(file, childItem);
+                }
+            }
+        }
     }
 
 }

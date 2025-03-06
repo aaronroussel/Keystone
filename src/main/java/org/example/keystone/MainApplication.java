@@ -29,16 +29,9 @@ public class MainApplication extends Application {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
         // ------------ GDAl -----------------
-        File file = new File("src/images/sample.tif");
         //File file = new File("src/images/sample.tif");
         //MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
         //assert metadataDecoder != null;
-        //String xmlString = metadataDecoder.getSpatialReferenceXML();
-        //ogr.CreateGeometryFromGML(xmlString);
-        //System.out.println(xmlString);
-        //System.out.println("\n\n\n---------------------------------------------------------------------");
-
-
         // ----------- Init UI -----------
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("hello-view.fxml")); // load fxml file
         Scene scene = new Scene(fxmlLoader.load(), 1920, 1080); // create new scene with loaded fxml
@@ -50,4 +43,5 @@ public class MainApplication extends Application {
     public static void main(String[] args) {
         launch();
     }
+
 }

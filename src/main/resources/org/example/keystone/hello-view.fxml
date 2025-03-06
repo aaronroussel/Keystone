@@ -9,13 +9,9 @@
     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
   </padding>
    <children>
-      <SplitPane id="FileScrollPane" dividerPositions="0.27689030883919064" prefHeight="885.0" prefWidth="586.0">
+      <SplitPane id="FileScrollPane" dividerPositions="0.1703940362087327" prefHeight="885.0" prefWidth="586.0">
         <items>
-            <ScrollPane id="fileScrollPane" prefHeight="839.0" prefWidth="288.0">
-               <content>
-                  <VBox fx:id="fileVBox" prefHeight="872.0" prefWidth="441.0" />
-               </content>
-            </ScrollPane>
+            <TreeView fx:id="fileDirectoryTreeView" prefHeight="883.0" prefWidth="542.0" />
             <TreeTableView fx:id="metadataTable" prefHeight="200.0" prefWidth="200.0">
               <columns>
                 <TreeTableColumn fx:id="metadataTableKeyCol" editable="false" prefWidth="539.0" text="Key" />
