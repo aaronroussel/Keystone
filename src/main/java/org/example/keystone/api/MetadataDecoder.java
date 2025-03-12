@@ -171,6 +171,11 @@ public abstract class MetadataDecoder {
         return spatialString;
     }
 
+    public String getSpatialReferenceXML() {
+        SpatialReference spatialReference = getSpatialReference();
+        return spatialReference.ExportToXML();
+    }
+
     public String getAllMetadataJSON() {
 
         /*
@@ -196,11 +201,55 @@ public abstract class MetadataDecoder {
         System.out.println(metadata);
     }
 
+    public SpatialReference newSpatialReferenceFromWkt(String wkt) {
+        SpatialReference spatialReference = new SpatialReference();
+        spatialReference.ImportFromWkt(wkt);
+        return spatialReference;
+    }
+
+    public SpatialReference newSpatialReferenceFromGCS(String gcs) {
+        SpatialReference spatialReference = new SpatialReference();
+        spatialReference.SetWellKnownGeogCS(gcs);
+        return spatialReference;
+    }
+
+    public SpatialReference newSpatialReferenceFromEPSG(int epsg) {
+        SpatialReference spatialReference = new SpatialReference();
+        spatialReference.ImportFromEPSG(epsg);
+        return spatialReference;
+    }
+
+    public void setUTM(int zone, int hemisphere, SpatialReference srs) {
+        srs.SetUTM(zone, hemisphere);
+    }
+
+    public SpatialReference newSpatialReferenceFromProj4(String proj) {
+        SpatialReference spatialReference = new SpatialReference();
+        spatialReference.ImportFromProj4(proj);
+        return spatialReference;
+    }
+
+    public SpatialReference newSpatialReferenceFromXML(String xml) {
+        SpatialReference spatialReference = new SpatialReference();
+        spatialReference.ImportFromXML(xml);
+        return spatialReference;
+    }
+
+    /*
+        below are abstract function declarations for writing metadata. How we write metadata and how we enforce
+        naming conventions will differ for each file type, so we only define an abstract definition here and then
+        implement the concrete function in the decoder classes that extend this abstract class
+     */
+
     public abstract void setSpatialReferenceFromWKT(String wktString);
 
     public abstract void setMetadataField(String key, String value);
 
     public abstract void setMetadataField(String key, String value, String domain);
+
+    public abstract void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable);
+
+    public abstract void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable, String domain);
 
     public boolean hasDataset() {
         return this.dataset != null;

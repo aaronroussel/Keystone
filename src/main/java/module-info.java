@@ -14,6 +14,7 @@ module org.example.keystone {
     requires gdal;
     requires org.geotools.api;
     requires org.geotools.metadata;
+    requires jdk.compiler;
 
     opens org.example.keystone to javafx.fxml;
     exports org.example.keystone;

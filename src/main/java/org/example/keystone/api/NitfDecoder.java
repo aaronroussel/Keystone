@@ -26,4 +26,12 @@ public class NitfDecoder extends MetadataDecoder {
         String newKey = "NITF_" + key.toUpperCase();
         this.dataset.SetMetadataItem(newKey, value.toUpperCase(), domain);
     }
+
+    public void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable) {
+        System.out.println("NULL");
+    }
+
+    public void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable, String domain) {
+        System.out.println("NULL");
+    }
 }
