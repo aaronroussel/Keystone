@@ -161,7 +161,6 @@ public abstract class MetadataDecoder {
          */
 
         SpatialReference spatialReference = getSpatialReference();
-        SpatialReference newSpatialReference = new SpatialReference();
         String spatialString;
         if (spatialReference.IsProjected() == 1 || spatialReference.IsGeographic() == 1 || spatialReference.IsGeocentric() == 1) {
             spatialString = spatialReference.ExportToPrettyWkt();
@@ -201,19 +200,19 @@ public abstract class MetadataDecoder {
         System.out.println(metadata);
     }
 
-    public SpatialReference newSpatialReferenceFromWkt(String wkt) {
+    public static SpatialReference newSpatialReferenceFromWkt(String wkt) {
         SpatialReference spatialReference = new SpatialReference();
         spatialReference.ImportFromWkt(wkt);
         return spatialReference;
     }
 
-    public SpatialReference newSpatialReferenceFromGCS(String gcs) {
+    public static SpatialReference newSpatialReferenceFromGCS(String gcs) {
         SpatialReference spatialReference = new SpatialReference();
         spatialReference.SetWellKnownGeogCS(gcs);
         return spatialReference;
     }
 
-    public SpatialReference newSpatialReferenceFromEPSG(int epsg) {
+    public static SpatialReference newSpatialReferenceFromEPSG(int epsg) {
         SpatialReference spatialReference = new SpatialReference();
         spatialReference.ImportFromEPSG(epsg);
         return spatialReference;
@@ -223,13 +222,13 @@ public abstract class MetadataDecoder {
         srs.SetUTM(zone, hemisphere);
     }
 
-    public SpatialReference newSpatialReferenceFromProj4(String proj) {
+    public static SpatialReference newSpatialReferenceFromProj4(String proj) {
         SpatialReference spatialReference = new SpatialReference();
         spatialReference.ImportFromProj4(proj);
         return spatialReference;
     }
 
-    public SpatialReference newSpatialReferenceFromXML(String xml) {
+    public static SpatialReference newSpatialReferenceFromXML(String xml) {
         SpatialReference spatialReference = new SpatialReference();
         spatialReference.ImportFromXML(xml);
         return spatialReference;
@@ -240,6 +239,8 @@ public abstract class MetadataDecoder {
         naming conventions will differ for each file type, so we only define an abstract definition here and then
         implement the concrete function in the decoder classes that extend this abstract class
      */
+
+    public abstract void setSpatialReference(SpatialReference srs);
 
     public abstract void setSpatialReferenceFromWKT(String wktString);
 

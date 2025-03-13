@@ -34,4 +34,8 @@ public class NitfDecoder extends MetadataDecoder {
     public void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable, String domain) {
         System.out.println("NULL");
     }
+
+    public void setSpatialReference(SpatialReference srs) {
+        this.dataset.SetSpatialRef(srs);
+    }
 }

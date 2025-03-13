@@ -23,6 +23,10 @@ public class TiffDecoder extends MetadataDecoder {
         super.dataset.SetSpatialRef(spatialReference);
     }
 
+    public void setSpatialReference(SpatialReference srs) {
+        super.dataset.SetSpatialRef(srs);
+    }
+
     public void setSpatialReferenceFromXML(String xml) {
         /*
             Creates a new spatial reference using XML
