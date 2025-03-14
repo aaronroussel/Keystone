@@ -15,7 +15,7 @@ public class MetadataDecoderFactory {
         }
 
         return switch (fileType) {
-            case "tif" -> new TiffDecoder(file);
+            case "tif", "TIF" -> new TiffDecoder(file);
             case "ntf" -> new NitfDecoder(file);
             case "jpg" -> null;
             case "png" -> null;

@@ -6,6 +6,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTreeCell;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.input.MouseEvent;
@@ -24,15 +26,16 @@ import java.util.Vector;
 
 public class MainApplicationController implements Initializable {
 
+    public ImageView imageViewer;
     /*
-                    This is the Main Application Controller
-    
-                    Here we can control the logic of our UI. @FXML annotated methods and variables are linked to the corresponding elements defined
-                    in the UI's FXML file, allowing us to interact with our UI elements using java code.
-    
-                    If using scenebuilder, you must set the fx:id to a unique value, then create a corresponding variable here with matching type
-                    and name. This can also be specified directly in the fxml file.
-                 */
+                        This is the Main Application Controller
+        
+                        Here we can control the logic of our UI. @FXML annotated methods and variables are linked to the corresponding elements defined
+                        in the UI's FXML file, allowing us to interact with our UI elements using java code.
+        
+                        If using scenebuilder, you must set the fx:id to a unique value, then create a corresponding variable here with matching type
+                        and name. This can also be specified directly in the fxml file.
+                     */
     @FXML
     private Label welcomeText;
 
@@ -68,7 +71,7 @@ public class MainApplicationController implements Initializable {
 
         populateFileDirectoryTreeView(directory);
 
-        File file = new File("src/images/sample.tif");
+        File file = new File("src/images/SP27GTIF.TIF");
         MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
         assert metadataDecoder != null;
         XMLNode xmlRootNode = gdal.ParseXMLString(metadataDecoder.getSpatialReferenceXML());
@@ -105,6 +108,10 @@ public class MainApplicationController implements Initializable {
 
         metadataTableKeyCol.setCellValueFactory(param -> param.getValue().getValue().nodeNameProperty());
         metadataTableValueCol.setCellValueFactory(param -> param.getValue().getValue().nodeValueProperty());
+
+        Image image = ImageProcessor.getBufferedImage(file);
+        imageViewer.setImage(image);
+        imageViewer.setPreserveRatio(true);
     }
 
     private TreeItem<XMLTreeNode> convertXMLNodeToTreeItem(XMLNode node, String parentPath) {
