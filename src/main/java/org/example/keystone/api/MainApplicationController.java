@@ -26,7 +26,6 @@ import java.util.Vector;
 
 public class MainApplicationController implements Initializable {
 
-    public ImageView imageViewer;
     /*
                         This is the Main Application Controller
         
@@ -109,9 +108,6 @@ public class MainApplicationController implements Initializable {
         metadataTableKeyCol.setCellValueFactory(param -> param.getValue().getValue().nodeNameProperty());
         metadataTableValueCol.setCellValueFactory(param -> param.getValue().getValue().nodeValueProperty());
 
-        Image image = ImageProcessor.getBufferedImage(file);
-        imageViewer.setImage(image);
-        imageViewer.setPreserveRatio(true);
     }
 
     private TreeItem<XMLTreeNode> convertXMLNodeToTreeItem(XMLNode node, String parentPath) {
