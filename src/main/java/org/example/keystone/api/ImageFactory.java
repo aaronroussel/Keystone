@@ -7,6 +7,13 @@ import java.io.File;
 public class ImageFactory {
 
     public static Image getFXImage(File file) {
+
+        /*
+          This is just a factory class used to create a javafx Image object from a file. This handles all file types we are supporting
+          and consolidates the different logic into a single factory class. This will help reduce conditional logic on the front end.
+          Please use this factory class for loading ALL types of images.
+        */
+
         String fileExtension = MetadataDecoderFactory.getFileExtension(file);
 
         if (fileExtension == null) {

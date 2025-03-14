@@ -36,6 +36,11 @@ public abstract class MetadataDecoder {
     protected File file;
 
     MetadataDecoder(File file) {
+
+        if (!file.isFile()) {
+            throw new IllegalArgumentException("Cannot instantiate object: " + file.getName() + " is not a valid file");
+        }
+
         this.file = file;
         getDataset();
     }
@@ -93,6 +98,10 @@ public abstract class MetadataDecoder {
 
         String filePath = this.file.getPath();
         gdal.AllRegister();
+        
+        if (filePath == null || filePath.isEmpty()) {
+          throw new IllegalArgumentException("file path is not valid: " + filePath);
+        }
 
         Dataset dataset = gdal.Open(filePath, gdalconstConstants.GA_Update);
         this.dataset = dataset;
@@ -104,6 +113,9 @@ public abstract class MetadataDecoder {
             obtain metadata domains that can then be used as input for the dataset.GetMetadata_List() function
             in order to fetch the metadata contained in each specific domain
         */
+        if (!this.hasDataset()) {
+          throw new IllegalArgumentException("No valid dataset associated with this object");
+        }
 
         Vector rawMetadataDomains = this.dataset.GetMetadataDomainList();
         Vector<String> metadataDomains = new Vector<String>();
@@ -125,6 +137,10 @@ public abstract class MetadataDecoder {
             in the default domain.
         */
 
+        if (!this.hasDataset()) {
+            throw new IllegalArgumentException("No valid dataset associated with this object");
+        }
+
         Hashtable rawMetadataTable = this.dataset.GetMetadata_Dict();
         Hashtable<String, String> metadataTable = new Hashtable<String, String>();
         for (Object keyObject : rawMetadataTable.keySet()) {
@@ -136,6 +152,11 @@ public abstract class MetadataDecoder {
     }
 
     public Hashtable<String, String> getMetadataHashTable(String domain) {
+
+        if (!this.hasDataset()) {
+          throw new IllegalArgumentException("No valid dataset associated with this object");
+        }
+
         Hashtable rawMetadataTable = this.dataset.GetMetadata_Dict(domain);
         Hashtable<String, String> metadataTable = new Hashtable<>();
         for (Object keyObject : rawMetadataTable.keySet()) {
@@ -150,7 +171,18 @@ public abstract class MetadataDecoder {
         /*
             returns a SpatialReference object, which we can then use to obtain coordinate information for the dataset
          */
-        SpatialReference spatialReference = new SpatialReference(this.dataset.GetProjection());
+        if (!this.hasDataset()) {
+            throw new IllegalArgumentException("No valid dataset associated with this object");
+        }
+
+        String projection = this.dataset.GetProjection();
+
+        if (projection == null || projection.isEmpty()) {
+            throw new IllegalArgumentException("null or empty projection found for this dataset");
+        }
+
+        SpatialReference spatialReference = new SpatialReference(projection);
+
         return spatialReference;
     }
 
@@ -159,18 +191,27 @@ public abstract class MetadataDecoder {
             This function returns a String in WKT format for the spatial reference data contained in the dataset
             For more info on WKT Format see: https://libgeos.org/specifications/wkt/
          */
+        if (!this.hasDataset()) {
+            throw new IllegalArgumentException("No valid dataset associated with this object");
+        }
 
         SpatialReference spatialReference = getSpatialReference();
         String spatialString;
+
         if (spatialReference.IsProjected() == 1 || spatialReference.IsGeographic() == 1 || spatialReference.IsGeocentric() == 1) {
             spatialString = spatialReference.ExportToPrettyWkt();
         } else {
             spatialString = "Spatial Reference is null";
         }
+
         return spatialString;
     }
 
     public String getSpatialReferenceXML() {
+        if (!this.hasDataset()) {
+            throw new IllegalArgumentException("No valid dataset associated with this object");
+        }
+
         SpatialReference spatialReference = getSpatialReference();
         return spatialReference.ExportToXML();
     }
@@ -201,18 +242,33 @@ public abstract class MetadataDecoder {
     }
 
     public static SpatialReference newSpatialReferenceFromWkt(String wkt) {
+        
+        if (wkt == null || wkt.isEmpty()) {
+            throw new IllegalArgumentException("null or empty WKT string");
+        }
+
         SpatialReference spatialReference = new SpatialReference();
         spatialReference.ImportFromWkt(wkt);
         return spatialReference;
     }
 
     public static SpatialReference newSpatialReferenceFromGCS(String gcs) {
+
+        if (gcs == null || gcs.isEmpty()) {
+            throw new IllegalArgumentException("null or empty GCS string");
+        }
+
         SpatialReference spatialReference = new SpatialReference();
         spatialReference.SetWellKnownGeogCS(gcs);
         return spatialReference;
     }
 
     public static SpatialReference newSpatialReferenceFromEPSG(int epsg) {
+
+        if (epsg < 1024 || epsg > 32767) {
+            throw new IllegalArgumentException("Invalid EPSG code");
+        }
+
         SpatialReference spatialReference = new SpatialReference();
         spatialReference.ImportFromEPSG(epsg);
         return spatialReference;
@@ -223,12 +279,22 @@ public abstract class MetadataDecoder {
     }
 
     public static SpatialReference newSpatialReferenceFromProj4(String proj) {
+        
+        if (proj == null || proj.isEmpty()) {
+            throw new IllegalArgumentException("Proj string is null or empty");
+        }
+
         SpatialReference spatialReference = new SpatialReference();
         spatialReference.ImportFromProj4(proj);
         return spatialReference;
     }
 
     public static SpatialReference newSpatialReferenceFromXML(String xml) {
+        
+        if (xml == null || xml.isEmpty()) {
+            throw new IllegalArgumentException("XML string is null or empty");
+        }
+
         SpatialReference spatialReference = new SpatialReference();
         spatialReference.ImportFromXML(xml);
         return spatialReference;
