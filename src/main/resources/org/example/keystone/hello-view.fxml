@@ -1,17 +1,142 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="1080.0" prefWidth="1920.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.keystone.api.MainApplicationController">
-  <padding>
-    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-  </padding>
+<VBox alignment="CENTER" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.keystone.api.MainApplicationController">
    <children>
-      <SplitPane id="FileScrollPane" dividerPositions="0.1703940362087327" prefHeight="885.0" prefWidth="586.0">
+      <MenuBar prefHeight="0.0" prefWidth="1959.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Open" />
+                  <MenuItem mnemonicParsing="false" text="Close" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Exit" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Find" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Select All" />
+                  <MenuItem mnemonicParsing="false" text="Invert Selection" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="View">
+               <items>
+                  <CheckMenuItem mnemonicParsing="false" text="Tool Bar" />
+                  <CheckMenuItem mnemonicParsing="false" text="Address Bar" />
+                  <CheckMenuItem mnemonicParsing="false" text="Status Bar" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <CheckMenuItem mnemonicParsing="false" text="Large Icons" />
+                  <CheckMenuItem mnemonicParsing="false" text="Small Icons" />
+                  <CheckMenuItem mnemonicParsing="false" text="List" />
+                  <CheckMenuItem mnemonicParsing="false" text="Details" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Columns">
+                     <graphic>
+                        <SplitMenuButton mnemonicParsing="false">
+                           <items>
+                              <CheckMenuItem mnemonicParsing="false" text="Version" />
+                              <CheckMenuItem mnemonicParsing="false" text="Four CC" />
+                              <CheckMenuItem mnemonicParsing="false" text="Zip Disk" />
+                              <CheckMenuItem mnemonicParsing="false" text="Zip Comment" />
+                              <CheckMenuItem mnemonicParsing="false" text="Create Version" />
+                              <CheckMenuItem mnemonicParsing="false" text="Extract Version" />
+                              <CheckMenuItem mnemonicParsing="false" text="Flags" />
+                              <CheckMenuItem mnemonicParsing="false" text="Compression Method" />
+                              <CheckMenuItem mnemonicParsing="false" text="CRC" />
+                              <CheckMenuItem mnemonicParsing="false" text="Disk" />
+                              <CheckMenuItem mnemonicParsing="false" text="Comment" />
+                           </items>
+                        </SplitMenuButton>
+                     </graphic>
+                  </MenuItem>
+               </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="Tools">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Batch">
+                     <graphic>
+                        <SplitMenuButton mnemonicParsing="false">
+                          <items>
+                            <MenuItem mnemonicParsing="false" text="Fragmentation Report" />
+                            <MenuItem mnemonicParsing="false" text="Defragment" />
+                              <MenuItem mnemonicParsing="false" text="Validate" />
+                          </items>
+                        </SplitMenuButton>
+                     </graphic>
+                  </MenuItem>
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Defragment" />
+                  <MenuItem mnemonicParsing="false" text="Validate" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="NCF File">
+                     <graphic>
+                        <SplitMenuButton mnemonicParsing="false">
+                          <items>
+                            <MenuItem mnemonicParsing="false" text="Auto Set NCF Path" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                            <MenuItem mnemonicParsing="false" text="Set NCF Path" />
+                              <MenuItem mnemonicParsing="false" text="Clear NCF Path" />
+                          </items>
+                        </SplitMenuButton>
+                     </graphic>
+                  </MenuItem>
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Options">
+              <items>
+                  <CheckMenuItem mnemonicParsing="false" text="Verbose" />
+                  <CheckMenuItem mnemonicParsing="false" text="Disable Warnings" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <CheckMenuItem mnemonicParsing="false" text="File Mapping" />
+                  <CheckMenuItem mnemonicParsing="false" text="Quick File Mapping" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <CheckMenuItem mnemonicParsing="false" text="Volatile Access" />
+                  <CheckMenuItem mnemonicParsing="false" text="Write Access" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Associations">
+                     <graphic>
+                        <SplitMenuButton mnemonicParsing="false">
+                           <items>
+                              <CheckMenuItem mnemonicParsing="false" text="Associate With GCF Files" />
+                              <CheckMenuItem mnemonicParsing="false" text="Associate With NCF Files" />
+                              <CheckMenuItem mnemonicParsing="false" text="Associate With PAK Files" />
+                              <CheckMenuItem mnemonicParsing="false" text="Associate With SGA Files" />
+                              <CheckMenuItem mnemonicParsing="false" text="Associate With VPK Files" />
+                              <CheckMenuItem mnemonicParsing="false" text="Associate With WAD Files" />
+                              <CheckMenuItem mnemonicParsing="false" text="Associate With XZP Files" />
+                           </items>
+                        </SplitMenuButton>
+                     </graphic>
+                  </MenuItem>
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Help">
+              <items>
+                <MenuItem mnemonicParsing="false" text="About" />
+              </items>
+            </Menu>
+        </menus>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </MenuBar>
+      <SplitPane id="FileScrollPane" dividerPositions="0.1703940362087327" prefHeight="1102.0" prefWidth="1964.0">
         <items>
-            <TreeView fx:id="fileDirectoryTreeView" prefHeight="883.0" prefWidth="542.0" />
+            <TreeView fx:id="fileDirectoryTreeView" prefHeight="776.0" prefWidth="324.0" />
             <TreeTableView fx:id="metadataTable" prefHeight="200.0" prefWidth="200.0">
               <columns>
                 <TreeTableColumn fx:id="metadataTableKeyCol" editable="false" prefWidth="539.0" text="Key" />
