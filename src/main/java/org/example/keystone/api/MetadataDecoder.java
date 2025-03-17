@@ -10,6 +10,8 @@ import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import static org.gdal.gdalconst.gdalconstConstants.CPLE_None;
+
 public abstract class MetadataDecoder {
     // parent class for metadata decoders. decoders for specific file types should inherit this class.
     // should help reduce amount of repeated code.
@@ -300,12 +302,98 @@ public abstract class MetadataDecoder {
         return spatialReference;
     }
 
+    public Hashtable<String, String> getGeoTransform() {
+
+        /*
+            This function gets the affine transformation data from a dataset. for more info 
+            on the data fields contained in affine transformation data, check this link: 
+            https://gdal.org/en/stable/tutorials/geotransforms_tut.html
+        */ 
+
+        double[] geoTransform = new double[6];
+        Hashtable<String, String> gt = new Hashtable<>();
+
+        dataset.GetGeoTransform(geoTransform);
+        if (checkIfValidGeoTransformArray(geoTransform)) {
+            gt.put("Top Left X", Double.toString(geoTransform[0]));
+            gt.put("Pixel Width", Double.toString(geoTransform[1]));
+            gt.put("Rotation (X-axis)", Double.toString(geoTransform[2]));
+            gt.put("Top Left Y", Double.toString(geoTransform[3]));
+            gt.put("Rotation (Y-axis)", Double.toString(geoTransform[4]));
+            gt.put("Pixel Height (negative for north-up)", Double.toString(geoTransform[5]));
+        } else {
+            throw new NullPointerException("No valid Geo-Transform for this dataset");
+        }
+         
+        return gt;
+    }
+
+    public static boolean checkIfValidGeoTransformArray(double[] array) {
+
+        /* an ugly helper function to check if a GeoTranform Array is valid. 
+           a newly initialized array in java will have default values, in this case its 0.0
+           so we need to check if the array is still filled with all default values. if it does,
+           we can assume that there is no valid GeoTransform since the function didn't place any
+           new data into the array.
+        */
+        boolean isValid = !(array[0] == 0.0 && array[1] == 0.0 && array[2] == 0.0 
+                            && array[3] == 0.0 && array[4] == 0.0 && array[5] == 0.0);
+
+        return isValid;
+    }
+
+    public Hashtable<String, String> getCornerCoordinates() {
+
+        /*
+         This function gets the corner coordinates of the image if there is a valid GeoTransform associated
+         with the dataset.
+        */ 
+        Hashtable<String, String> cornerCoordinates = new Hashtable<>();
+        double[] geoTransform = new double[6];
+
+        dataset.GetGeoTransform(geoTransform); // The GetGeoTransform function modifies an existing vector in place
+
+        if (!checkIfValidGeoTransformArray(geoTransform)) {
+            throw new NullPointerException("No valid Geo-Transform for this dataset, cannot get corner coordinates");
+        }
+
+        // We need to get the X and Y pixel resolution of the image first
+        int width = dataset.getRasterXSize();
+        int height = dataset.getRasterYSize();
+
+        // Use our helper function to convert into coordinates
+        double[] topLeft = pixelToGeo(geoTransform, 0, 0);
+        double[] topRight = pixelToGeo(geoTransform, width, 0);
+        double[] bottomLeft = pixelToGeo(geoTransform, 0, height);
+        double[] bottomRight = pixelToGeo(geoTransform, width, height);
+
+        cornerCoordinates.put("Top Left", "(" + topLeft[0] + ", " + topLeft[1] + ")");
+        cornerCoordinates.put("Top Right", "(" + topRight[0] + ", " + topRight[1] + ")");
+        cornerCoordinates.put("Bottom Left", "(" + bottomLeft[0] + ", " + bottomLeft[1] + ")");
+        cornerCoordinates.put("Bottom Right", "(" + bottomRight[0] + ", " + bottomRight[1] + ")");
+
+        return cornerCoordinates;
+    }
+
+    private double[] pixelToGeo(double[] geoTransform, int pixelX, int pixelY) {
+
+        // Helper function to convert geoTransform data to corner coordinates
+        
+        double geoX = geoTransform[0] + pixelX * geoTransform[1] + pixelY * geoTransform[2];
+        double geoY = geoTransform[3] + pixelX * geoTransform[4] + pixelY * geoTransform[5];
+        return new double[]{geoX, geoY};
+    }
+
+
+        
+
+
     /*
         below are abstract function declarations for writing metadata. How we write metadata and how we enforce
         naming conventions will differ for each file type, so we only define an abstract definition here and then
         implement the concrete function in the decoder classes that extend this abstract class
      */
-
+    
     public abstract void setSpatialReference(SpatialReference srs);
 
     public abstract void setSpatialReferenceFromWKT(String wktString);
