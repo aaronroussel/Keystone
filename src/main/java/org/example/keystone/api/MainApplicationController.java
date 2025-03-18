@@ -64,8 +64,7 @@ public class MainApplicationController implements Initializable {
     //public TreeTableColumn<MetadataEntry, String> metadataTableValueCol;
 
     public String directoryPath = "src/images/";
-
-    public String fileName;
+    
 
     @FXML
     protected void onHelloButtonClick() {
@@ -211,9 +210,14 @@ public class MainApplicationController implements Initializable {
 
             });
             cell.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
-                fileName = cell.getText();
 
-                loadMetadata();
+                File cellFile = cell.getItem();
+
+                if (!cellFile.isDirectory()) {
+                    String filePath = cellFile.getAbsolutePath();
+
+                    loadMetadata(filePath);
+                }
 
             });
             return cell;
@@ -229,6 +233,7 @@ public class MainApplicationController implements Initializable {
         if (files != null) {
             for (File file : files) {
                 TreeItem<File> childItem = new TreeItem<>(file);
+
                 parentItem.getChildren().add(childItem);
 
                 if (file.isDirectory()) {
@@ -275,9 +280,9 @@ public class MainApplicationController implements Initializable {
 
     }
 
-    public void loadMetadata() {
+    public void loadMetadata(String filePath) {
 
-        File file = new File(directoryPath + '/' + fileName);
+        File file = new File(filePath);
         MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
         assert metadataDecoder != null;
         XMLNode xmlRootNode = gdal.ParseXMLString(metadataDecoder.getSpatialReferenceXML());
