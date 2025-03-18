@@ -37,7 +37,7 @@ public abstract class MetadataDecoder {
     protected Dataset dataset;
     protected File file;
 
-    MetadataDecoder(File file) {
+    MetadataDecoder(File file, Dataset dataset) {
 
         if (!file.isFile()) {
             throw new IllegalArgumentException("Cannot instantiate object: " + file.getName() + " is not a valid file");
@@ -98,14 +98,14 @@ public abstract class MetadataDecoder {
     public void getDataset() {
         // used by the constructor to obtain a dataset from the input file object
 
-        String filePath = this.file.getPath();
+        String filePath = this.file.getAbsolutePath();
         gdal.AllRegister();
         
         if (filePath == null || filePath.isEmpty()) {
           throw new IllegalArgumentException("file path is not valid: " + filePath);
         }
 
-        Dataset dataset = gdal.Open(filePath, gdalconstConstants.GA_Update);
+        Dataset dataset = gdal.Open(filePath);
         this.dataset = dataset;
     }
 
@@ -154,10 +154,12 @@ public abstract class MetadataDecoder {
     }
 
     public Hashtable<String, String> getMetadataHashTable(String domain) {
-
+        /*
         if (!this.hasDataset()) {
           throw new IllegalArgumentException("No valid dataset associated with this object");
         }
+
+         */
 
         Hashtable rawMetadataTable = this.dataset.GetMetadata_Dict(domain);
         Hashtable<String, String> metadataTable = new Hashtable<>();

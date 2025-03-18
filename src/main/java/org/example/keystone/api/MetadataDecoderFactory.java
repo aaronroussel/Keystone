@@ -1,5 +1,9 @@
 package org.example.keystone.api;
 
+import org.gdal.gdal.Dataset;
+import org.gdal.gdal.gdal;
+import org.gdal.gdalconst.gdalconstConstants;
+
 import java.io.File;
 
 public class MetadataDecoderFactory {
@@ -15,9 +19,9 @@ public class MetadataDecoderFactory {
         }
 
         return switch (fileType) {
-            case "tif", "TIF" -> new TiffDecoder(file);
-            case "ntf" -> new NitfDecoder(file);
-            case "jpg" -> null;
+            case "tif", "TIF" -> new TiffDecoder(file, getDataset(file, true));
+            case "ntf" -> new NitfDecoder(file, getDataset(file, true));
+            case "jpg" -> new JpegDecoder(file, getDataset(file, false));
             case "png" -> null;
             default -> throw new UnsupportedOperationException("Unsupported File Type: " + fileType);
         };
@@ -33,5 +37,21 @@ public class MetadataDecoderFactory {
         }
 
         return fileName.substring(lastDotIndex + 1);
+    }
+
+    private static Dataset getDataset(File file, boolean updateMode) {
+        // used by the constructor to obtain a dataset from the input file object
+
+        String filePath = file.getAbsolutePath();
+        gdal.AllRegister();
+
+        if (filePath == null || filePath.isEmpty()) {
+            throw new IllegalArgumentException("file path is not valid: " + filePath);
+        }
+
+        int mode = updateMode ? gdalconstConstants.GA_Update : gdalconstConstants.GA_ReadOnly;
+        Dataset dataset = gdal.Open(filePath, mode);
+
+        return dataset;
     }
 }

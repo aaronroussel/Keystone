@@ -1,17 +1,16 @@
 package org.example.keystone.api;
 
+import org.gdal.gdal.Dataset;
 import org.gdal.osr.SpatialReference;
 
 import java.io.File;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
 
 public class TiffDecoder extends MetadataDecoder {
 
-    public TiffDecoder(File file) {
-        super(file);
-        super.getDataset();
+    public TiffDecoder(File file, Dataset dataset) {
+        super(file, dataset);
     }
 
     public void setSpatialReferenceFromWKT(String wktString) {
