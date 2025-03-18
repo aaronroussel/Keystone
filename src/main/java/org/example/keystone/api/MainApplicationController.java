@@ -80,7 +80,7 @@ public class MainApplicationController implements Initializable {
 
         populateFileDirectoryTreeView(directory);
 
-        File file = new File("src/images/SP27GTIF.TIF");
+        File file = new File("src/images/sample.tif");
         MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
         assert metadataDecoder != null;
         XMLNode xmlRootNode = gdal.ParseXMLString(metadataDecoder.getSpatialReferenceXML());
