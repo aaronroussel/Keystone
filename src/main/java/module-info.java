@@ -6,7 +6,6 @@ module org.example.keystone {
     requires org.controlsfx.controls;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
-    requires java.desktop;
     requires org.geotools.geotiff;
     requires org.geotools.coverage;
     requires org.pf4j;
@@ -15,6 +14,8 @@ module org.example.keystone {
     requires org.geotools.api;
     requires org.geotools.metadata;
     requires jdk.compiler;
+    requires jai.core;
+    requires javafx.swing;
 
     opens org.example.keystone to javafx.fxml;
     exports org.example.keystone;

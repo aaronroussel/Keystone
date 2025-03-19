@@ -1,5 +1,6 @@
 package org.example.keystone.api;
 
+import org.gdal.gdal.Dataset;
 import org.gdal.osr.SpatialReference;
 
 import java.io.File;
@@ -7,9 +8,8 @@ import java.util.Hashtable;
 
 public class NitfDecoder extends MetadataDecoder {
 
-    NitfDecoder(File file) {
-        super(file);
-        super.getDataset();
+    NitfDecoder(File file, Dataset dataset) {
+        super(file, dataset);
     }
 
     public void setSpatialReferenceFromWKT(String wktString) {
@@ -33,5 +33,9 @@ public class NitfDecoder extends MetadataDecoder {
 
     public void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable, String domain) {
         System.out.println("NULL");
+    }
+
+    public void setSpatialReference(SpatialReference srs) {
+        this.dataset.SetSpatialRef(srs);
     }
 }
