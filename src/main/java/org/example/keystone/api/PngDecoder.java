@@ -7,9 +7,9 @@ import java.io.File;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-public class TiffDecoder extends MetadataDecoder {
+public class PngDecoder extends MetadataDecoder {
 
-    public TiffDecoder(File file, Dataset dataset) {
+    public PngDecoder(File file, Dataset dataset) {
         super(file, dataset);
     }
 
@@ -73,6 +73,7 @@ public class TiffDecoder extends MetadataDecoder {
     }
 
     public void setExifMetadata(Hashtable<String, String> exifData) {
+
     }
 
     public void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable) {

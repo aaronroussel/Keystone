@@ -404,6 +404,8 @@ public abstract class MetadataDecoder {
 
     public abstract void setMetadataField(String key, String value, String domain);
 
+    public abstract void setExifMetadata(Hashtable<String, String> exifData);
+
     public abstract void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable);
 
     public abstract void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable, String domain);

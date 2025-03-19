@@ -17,6 +17,10 @@ public class NitfDecoder extends MetadataDecoder {
         this.dataset.SetSpatialRef(spatialReference);
     }
 
+    public void setSpatialReference(SpatialReference srs) {
+        this.dataset.SetSpatialRef(srs);
+    }
+
     public void setMetadataField(String key, String value) {
         String newKey = "NITF_" + key.toUpperCase();
         this.dataset.SetMetadataItem(newKey, value.toUpperCase());
@@ -31,11 +35,11 @@ public class NitfDecoder extends MetadataDecoder {
         System.out.println("NULL");
     }
 
+    public void setExifMetadata(Hashtable<String, String> exifData) {
+    }
+
     public void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable, String domain) {
         System.out.println("NULL");
     }
 
-    public void setSpatialReference(SpatialReference srs) {
-        this.dataset.SetSpatialRef(srs);
-    }
 }
