@@ -15,6 +15,7 @@ import org.pf4j.PluginManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Hashtable;
 
 public class MainApplication extends Application {
     @Override
@@ -24,7 +25,7 @@ public class MainApplication extends Application {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
         // ------------ GDAl -----------------
-        
+
         // ----------- Init UI -----------
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("hello-view.fxml")); // load fxml file
         Scene scene = new Scene(fxmlLoader.load(), 1920, 1080); // create new scene with loaded fxml
