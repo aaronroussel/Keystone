@@ -20,7 +20,7 @@ public class ImageFactory {
             throw new IllegalArgumentException("File extension error: null");
         }
         return switch (fileExtension) {
-            case "jpeg", "png" -> new Image(file.getPath());
+            case "jpg", "png" -> new Image(file.toURI().toString());
             case "ntf", "tif", "TIF" -> ImageProcessor.getBufferedImage(file);
             default -> throw new IllegalStateException("Unsupported file type: " + fileExtension);
         };

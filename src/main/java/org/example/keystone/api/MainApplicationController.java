@@ -34,14 +34,14 @@ import java.util.Vector;
 public class MainApplicationController implements Initializable {
 
     /*
-                        This is the Main Application Controller
-        
-                        Here we can control the logic of our UI. @FXML annotated methods and variables are linked to the corresponding elements defined
-                        in the UI's FXML file, allowing us to interact with our UI elements using java code.
-        
-                        If using scenebuilder, you must set the fx:id to a unique value, then create a corresponding variable here with matching type
-                        and name. This can also be specified directly in the fxml file.
-                     */
+                            This is the Main Application Controller
+
+                            Here we can control the logic of our UI. @FXML annotated methods and variables are linked to the corresponding elements defined
+                            in the UI's FXML file, allowing us to interact with our UI elements using java code.
+
+                            If using scenebuilder, you must set the fx:id to a unique value, then create a corresponding variable here with matching type
+                            and name. This can also be specified directly in the fxml file.
+                         */
     @FXML
     private Label welcomeText;
 
@@ -53,6 +53,9 @@ public class MainApplicationController implements Initializable {
 
     @FXML
     private VBox fileVBox;
+
+    @FXML
+    public ImageView imageViewer;
 
     @FXML
     public TreeTableView<XMLTreeNode> metadataTable;
@@ -75,48 +78,6 @@ public class MainApplicationController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        File directory = new File(directoryPath);
-
-        populateFileDirectoryTreeView(directory);
-
-        File file = new File("src/images/sample.tif");
-        MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
-        assert metadataDecoder != null;
-        XMLNode xmlRootNode = gdal.ParseXMLString(metadataDecoder.getSpatialReferenceXML());
-        TreeItem<XMLTreeNode> topNode = new TreeItem<>(new XMLTreeNode("Metadata", "", ""));
-        TreeItem<XMLTreeNode> rootNode = new TreeItem<>(new XMLTreeNode("Spatial Reference Metadata", "", ""));
-        TreeItem<XMLTreeNode> spatialRefRootNode = convertXMLNodeToTreeItem(xmlRootNode, "");
-
-        Vector<String> metadataDomains = metadataDecoder.getMetadataDomains();
-        TreeItem<XMLTreeNode> metadataRootNode = new TreeItem<>(new XMLTreeNode("Metadata Domains", "", ""));
-        for (String domain : metadataDomains) {
-            TreeItem<XMLTreeNode> domainNode;
-            if (domain.isEmpty()) {
-               domainNode = new TreeItem<>(new XMLTreeNode("DEFAULT", "", ""));
-            } else {
-               domainNode = new TreeItem<>(new XMLTreeNode(domain, "", ""));
-            }
-            Hashtable<String, String> table = metadataDecoder.getMetadataHashTable(domain);
-            Vector<TreeItem<XMLTreeNode>> treeItems = convertHashTableToTreeEntries(table);
-            for (TreeItem<XMLTreeNode> item : treeItems) {
-                domainNode.getChildren().add(item);
-            }
-            domainNode.setExpanded(true);
-            metadataRootNode.getChildren().add(domainNode);
-        }
-        rootNode.setExpanded(true);
-        spatialRefRootNode.setExpanded(true);
-        metadataRootNode.setExpanded(true);
-        rootNode.getChildren().add(spatialRefRootNode);
-        topNode.getChildren().add(rootNode);
-        topNode.getChildren().add(metadataRootNode);
-
-        metadataTable.setRoot(topNode);
-        metadataTable.setShowRoot(false);
-
-        metadataTableKeyCol.setCellValueFactory(param -> param.getValue().getValue().nodeNameProperty());
-        metadataTableValueCol.setCellValueFactory(param -> param.getValue().getValue().nodeValueProperty());
 
     }
 
@@ -144,7 +105,7 @@ public class MainApplicationController implements Initializable {
         }
 
         if (nodeName.equals("name")) {
-            nodeName = "EPSG";
+            nodeName = "ESPG";
         }
 
 
@@ -218,7 +179,12 @@ public class MainApplicationController implements Initializable {
 
                 if (!cellFile.isDirectory()) {
                     String filePath = cellFile.getAbsolutePath();
-
+                    try {
+                        Image image = ImageFactory.getFXImage(cellFile);
+                        imageViewer.setImage(image);
+                    } catch (Exception e) {
+                        System.err.println("Error Loading Image: " + e);
+                    }
                     loadMetadata(filePath);
                 }
 
@@ -284,43 +250,103 @@ public class MainApplicationController implements Initializable {
     }
 
     public void loadMetadata(String filePath) {
+        try {
+            File file = new File(filePath);
+            MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
 
-        File file = new File(filePath);
-        MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
-        assert metadataDecoder != null;
-        XMLNode xmlRootNode = gdal.ParseXMLString(metadataDecoder.getSpatialReferenceXML());
-        TreeItem<XMLTreeNode> topNode = new TreeItem<>(new XMLTreeNode("Metadata", "", ""));
-        TreeItem<XMLTreeNode> rootNode = new TreeItem<>(new XMLTreeNode("Spatial Reference Metadata", "", ""));
-        TreeItem<XMLTreeNode> spatialRefRootNode = convertXMLNodeToTreeItem(xmlRootNode, "");
+            if (metadataDecoder == null) {
+                throw new IllegalArgumentException("Unsupported file format, or unable to create decoder");
+            }
 
-        Vector<String> metadataDomains = metadataDecoder.getMetadataDomains();
-        TreeItem<XMLTreeNode> metadataRootNode = new TreeItem<>(new XMLTreeNode("Metadata Domains", "", ""));
-        for (String domain : metadataDomains) {
-            TreeItem<XMLTreeNode> domainNode;
-            if (domain.isEmpty()) {
-                domainNode = new TreeItem<>(new XMLTreeNode("DEFAULT", "", ""));
-            } else {
-                domainNode = new TreeItem<>(new XMLTreeNode(domain, "", ""));
+            TreeItem<XMLTreeNode> topNode = new TreeItem<>(new XMLTreeNode("Metadata", "", ""));
+            TreeItem<XMLTreeNode> rootNode = new TreeItem<>(new XMLTreeNode("Spatial Reference Metadata", "", ""));
+            TreeItem<XMLTreeNode> spatialRefRootNode = null;
+            // Spatial Ref
+            try {
+                String spatialReferenceXML = metadataDecoder.getSpatialReferenceXML();
+
+                if (spatialReferenceXML != null && !spatialReferenceXML.isEmpty())  {
+                    XMLNode xmlRootNode = gdal.ParseXMLString(spatialReferenceXML);
+                    spatialRefRootNode = convertXMLNodeToTreeItem(xmlRootNode, "");
+                }
+
+            } catch (Exception e) {
+                System.err.println("Failed to retrieve spatial reference metadata for " + file.getName());
             }
-            Hashtable<String, String> table = metadataDecoder.getMetadataHashTable(domain);
-            Vector<TreeItem<XMLTreeNode>> treeItems = convertHashTableToTreeEntries(table);
-            for (TreeItem<XMLTreeNode> item : treeItems) {
-                domainNode.getChildren().add(item);
+            // Metadata Fields
+
+            TreeItem<XMLTreeNode> metadataRootNode = new TreeItem<>(new XMLTreeNode("Metadata Domains", "", ""));
+            try {
+                Vector<String> metadataDomains = metadataDecoder.getMetadataDomains();
+
+                for (String domain : metadataDomains) {
+                    TreeItem<XMLTreeNode> domainNode;
+                    if (domain.isEmpty()) {
+                        domainNode = new TreeItem<>(new XMLTreeNode("DEFAULT", "", ""));
+                    } else {
+                        domainNode = new TreeItem<>(new XMLTreeNode(domain, "", ""));
+                    }
+                    Hashtable<String, String> table = metadataDecoder.getMetadataHashTable(domain);
+                    Vector<TreeItem<XMLTreeNode>> treeItems = convertHashTableToTreeEntries(table);
+                    for (TreeItem<XMLTreeNode> item : treeItems) {
+                        domainNode.getChildren().add(item);
+                    }
+                    domainNode.setExpanded(true);
+                    metadataRootNode.getChildren().add(domainNode);
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to retrieve metadata domains");
             }
-            domainNode.setExpanded(true);
-            metadataRootNode.getChildren().add(domainNode);
+
+            TreeItem<XMLTreeNode> geoTransformRootNode = new TreeItem<>(new XMLTreeNode("Affine Transformation Data", "", ""));
+            try {
+                Hashtable<String, String> affineTransforms = metadataDecoder.getGeoTransform();
+                Vector<TreeItem<XMLTreeNode>> items = convertHashTableToTreeEntries(affineTransforms);
+                for (TreeItem<XMLTreeNode> item : items) {
+                    geoTransformRootNode.getChildren().add(item);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            TreeItem<XMLTreeNode> cornerCoordinatesRootNode = new TreeItem<>(new XMLTreeNode("Corner Coordinates", "", ""));
+            try {
+                Hashtable<String, String> cornerCoordinates = metadataDecoder.getCornerCoordinates();
+                Vector<TreeItem<XMLTreeNode>> items = convertHashTableToTreeEntries(cornerCoordinates);
+                for (TreeItem<XMLTreeNode> item : items) {
+                    cornerCoordinatesRootNode.getChildren().add(item);
+                }
+            } catch (Exception e) {
+                System.err.println("Error when loading corner coordinates");
+            }
+
+
+            if (spatialRefRootNode != null) {
+                TreeItem<XMLTreeNode> spatialrefNode = new TreeItem<>(new XMLTreeNode("Spatial Reference","",""));
+                spatialrefNode.getChildren().add(spatialRefRootNode);
+                rootNode.getChildren().add(spatialrefNode);
+            }
+
+            if (geoTransformRootNode != null) {
+                rootNode.getChildren().add(geoTransformRootNode);
+            }
+
+            if (cornerCoordinatesRootNode != null) {
+                rootNode.getChildren().add(cornerCoordinatesRootNode);
+            }
+
+            if (metadataRootNode != null) {
+                topNode.getChildren().add(metadataRootNode);
+            }
+            topNode.getChildren().add(rootNode);
+            metadataTable.setRoot(topNode);
+            metadataTable.setShowRoot(false);
+
+            metadataTableKeyCol.setCellValueFactory(param -> param.getValue().getValue().nodeNameProperty());
+            metadataTableValueCol.setCellValueFactory(param -> param.getValue().getValue().nodeValueProperty());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        rootNode.setExpanded(true);
-        spatialRefRootNode.setExpanded(true);
-        metadataRootNode.setExpanded(true);
-        rootNode.getChildren().add(spatialRefRootNode);
-        topNode.getChildren().add(rootNode);
-        topNode.getChildren().add(metadataRootNode);
 
-        metadataTable.setRoot(topNode);
-        metadataTable.setShowRoot(false);
-
-        metadataTableKeyCol.setCellValueFactory(param -> param.getValue().getValue().nodeNameProperty());
-        metadataTableValueCol.setCellValueFactory(param -> param.getValue().getValue().nodeValueProperty());
     }
 }
