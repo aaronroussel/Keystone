@@ -347,36 +347,42 @@ public abstract class MetadataDecoder {
     public Hashtable<String, String> getCornerCoordinates() {
 
         /*
-         This function gets the corner coordinates of the image if there is a valid GeoTransform associated
-         with the dataset.
-        */ 
+         * This function gets the corner coordinates of the image if there is a valid GeoTransform associated
+         * with the dataset. It now also includes the geographic coordinate of the image center.
+         */
         Hashtable<String, String> cornerCoordinates = new Hashtable<>();
         double[] geoTransform = new double[6];
 
-        dataset.GetGeoTransform(geoTransform); // The GetGeoTransform function modifies an existing vector in place
+        // The GetGeoTransform function modifies an existing array in place
+        dataset.GetGeoTransform(geoTransform);
 
         if (!checkIfValidGeoTransformArray(geoTransform)) {
             throw new NullPointerException("No valid Geo-Transform for this dataset, cannot get corner coordinates");
         }
 
-        // We need to get the X and Y pixel resolution of the image first
+        // We need the width and height of the raster to compute pixel coordinates.
         int width = dataset.getRasterXSize();
         int height = dataset.getRasterYSize();
 
-        // Use our helper function to convert into coordinates
+        // Convert corner pixel locations to geographic coordinates
         double[] topLeft = pixelToGeo(geoTransform, 0, 0);
         double[] topRight = pixelToGeo(geoTransform, width, 0);
         double[] bottomLeft = pixelToGeo(geoTransform, 0, height);
         double[] bottomRight = pixelToGeo(geoTransform, width, height);
 
-        cornerCoordinates.put("Top Left", "(" + topLeft[0] + ", " + topLeft[1] + ")");
-        cornerCoordinates.put("Top Right", "(" + topRight[0] + ", " + topRight[1] + ")");
-        cornerCoordinates.put("Bottom Left", "(" + bottomLeft[0] + ", " + bottomLeft[1] + ")");
+        // Compute center coordinate
+        int centerX = width / 2;
+        int centerY = height / 2;
+        double[] center = pixelToGeo(geoTransform, centerX, centerY);
+
+        cornerCoordinates.put("Top Left",     "(" + topLeft[0]     + ", " + topLeft[1]     + ")");
+        cornerCoordinates.put("Top Right",    "(" + topRight[0]    + ", " + topRight[1]    + ")");
+        cornerCoordinates.put("Bottom Left",  "(" + bottomLeft[0]  + ", " + bottomLeft[1]  + ")");
         cornerCoordinates.put("Bottom Right", "(" + bottomRight[0] + ", " + bottomRight[1] + ")");
+        cornerCoordinates.put("Center",       "(" + center[0]      + ", " + center[1]      + ")");
 
         return cornerCoordinates;
     }
-
     private double[] pixelToGeo(double[] geoTransform, int pixelX, int pixelY) {
 
         // Helper function to convert geoTransform data to corner coordinates
