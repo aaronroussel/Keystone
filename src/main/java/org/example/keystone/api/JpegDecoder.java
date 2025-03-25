@@ -5,6 +5,7 @@ import org.gdal.osr.SpatialReference;
 
 import java.io.File;
 import java.util.Hashtable;
+import java.util.Vector;
 
 public class JpegDecoder extends MetadataDecoder {
     JpegDecoder(File file, Dataset dataset) {
@@ -40,4 +41,20 @@ public class JpegDecoder extends MetadataDecoder {
     public void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable, String domain) {
 
     }
+
+    @Override
+    public Vector<String> getMetadataDomains() {
+        Vector domainsRaw = super.dataset.GetMetadataDomainList();
+        Vector<String> domains = new Vector<>();
+        for (Object domain : domains) {
+            domains.add(domain.toString());
+        }
+        domains.add("");
+        domains.add("xml:XMP");
+
+        return domains;
+    }
+
+
+
 }
