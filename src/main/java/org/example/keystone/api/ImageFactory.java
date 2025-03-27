@@ -3,6 +3,7 @@ package org.example.keystone.api;
 import javafx.scene.image.Image;
 
 import java.io.File;
+import java.io.IOException;
 
 public class ImageFactory {
 
@@ -21,7 +22,8 @@ public class ImageFactory {
         }
         return switch (fileExtension) {
             case "jpg", "png" -> new Image(file.toURI().toString());
-            case "ntf", "tif", "TIF" -> ImageProcessor.getBufferedImage(file);
+            case "tif", "TIF" -> ImageProcessor.getBufferedImageGeoTiff(file);
+            case "ntf" -> ImageProcessor.getBufferedImageNitf(file);
             default -> throw new IllegalStateException("Unsupported file type: " + fileExtension);
         };
     }
