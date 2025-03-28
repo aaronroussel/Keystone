@@ -3,14 +3,12 @@ package org.example.keystone.api;
 import org.gdal.gdal.Dataset;
 import org.gdal.gdal.InfoOptions;
 import org.gdal.gdal.gdal;
-import org.gdal.gdalconst.gdalconstConstants;
 import org.gdal.osr.SpatialReference;
 
 import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import static org.gdal.gdalconst.gdalconstConstants.CPLE_None;
 
 public abstract class MetadataDecoder {
     // parent class for metadata decoders. decoders for specific file types should inherit this class.
@@ -26,7 +24,7 @@ public abstract class MetadataDecoder {
 
         This class should also probably implement some kind of interface with generalized function definitions for common
         operations. This will tie in with pf4j for the plugin support. We have reading and writing metadata as core functionality
-        and plugins will implement the specifics. This parent class should also implement that interface once its written. Again,
+        and plugins will implement the specifics. This parent class should also implement that interface once it's written. Again,
         this will probably be done AFTER we have working implementations for all of our supported file types, that way we have a
         big picture look at everything and can refactor from there into something with better structure than isolated classes with
         a lot of repeated code
@@ -62,7 +60,7 @@ public abstract class MetadataDecoder {
         // using getMetadataDomains() we can obtain a list of all private metadata domains, which can then be used
         // to obtains the metadata contained in those domains by inputting each domain name into GetMetadata_List()
         Vector<String> metadataDomains = this.getMetadataDomains();
-        Vector<String> metadataList = new Vector<String>();
+        Vector<String> metadataList = new Vector<>();
 
         if (metadataDomains != null) {
             for (String s : metadataDomains) {
@@ -101,12 +99,11 @@ public abstract class MetadataDecoder {
         String filePath = this.file.getAbsolutePath();
         gdal.AllRegister();
         
-        if (filePath == null || filePath.isEmpty()) {
+        if (filePath.isEmpty()) {
           throw new IllegalArgumentException("file path is not valid: " + filePath);
         }
 
-        Dataset dataset = gdal.Open(filePath);
-        this.dataset = dataset;
+        this.dataset = gdal.Open(filePath);
     }
 
     public Vector<String> getMetadataDomains() {
@@ -120,7 +117,7 @@ public abstract class MetadataDecoder {
         }
 
         Vector rawMetadataDomains = this.dataset.GetMetadataDomainList();
-        Vector<String> metadataDomains = new Vector<String>();
+        Vector<String> metadataDomains = new Vector<>();
         if (rawMetadataDomains != null) {
             for (Object object : rawMetadataDomains) {
                 metadataDomains.add(object.toString());
@@ -144,7 +141,7 @@ public abstract class MetadataDecoder {
         }
 
         Hashtable rawMetadataTable = this.dataset.GetMetadata_Dict();
-        Hashtable<String, String> metadataTable = new Hashtable<String, String>();
+        Hashtable<String, String> metadataTable = new Hashtable<>();
         for (Object keyObject : rawMetadataTable.keySet()) {
             Object valueObject = rawMetadataTable.get(keyObject);
             metadataTable.put(keyObject.toString(), valueObject.toString());
@@ -154,12 +151,6 @@ public abstract class MetadataDecoder {
     }
 
     public Hashtable<String, String> getMetadataHashTable(String domain) {
-        /*
-        if (!this.hasDataset()) {
-          throw new IllegalArgumentException("No valid dataset associated with this object");
-        }
-
-         */
 
         Hashtable rawMetadataTable = this.dataset.GetMetadata_Dict(domain);
         Hashtable<String, String> metadataTable = new Hashtable<>();
@@ -185,9 +176,7 @@ public abstract class MetadataDecoder {
             throw new IllegalArgumentException("null or empty projection found for this dataset");
         }
 
-        SpatialReference spatialReference = new SpatialReference(projection);
-
-        return spatialReference;
+        return new SpatialReference(projection);
     }
 
     public String getSpatialReferenceWKT() {
@@ -233,8 +222,7 @@ public abstract class MetadataDecoder {
         Vector<String> options = new Vector<>();
         options.add("-json");
         InfoOptions infoOptions = new InfoOptions(options);
-        String jsonInfo = gdal.GDALInfo(this.dataset, infoOptions);
-        return jsonInfo;
+        return gdal.GDALInfo(this.dataset, infoOptions);
     }
 
     public void printAllMetadata() {
@@ -338,45 +326,50 @@ public abstract class MetadataDecoder {
            we can assume that there is no valid GeoTransform since the function didn't place any
            new data into the array.
         */
-        boolean isValid = !(array[0] == 0.0 && array[1] == 0.0 && array[2] == 0.0 
-                            && array[3] == 0.0 && array[4] == 0.0 && array[5] == 0.0);
 
-        return isValid;
+        return !(array[0] == 0.0 && array[1] == 0.0 && array[2] == 0.0
+                            && array[3] == 0.0 && array[4] == 0.0 && array[5] == 0.0);
     }
 
     public Hashtable<String, String> getCornerCoordinates() {
 
         /*
-         This function gets the corner coordinates of the image if there is a valid GeoTransform associated
-         with the dataset.
-        */ 
+         * This function gets the corner coordinates of the image if there is a valid GeoTransform associated
+         * with the dataset. It now also includes the geographic coordinate of the image center.
+         */
         Hashtable<String, String> cornerCoordinates = new Hashtable<>();
         double[] geoTransform = new double[6];
 
-        dataset.GetGeoTransform(geoTransform); // The GetGeoTransform function modifies an existing vector in place
+        // The GetGeoTransform function modifies an existing array in place
+        dataset.GetGeoTransform(geoTransform);
 
         if (!checkIfValidGeoTransformArray(geoTransform)) {
             throw new NullPointerException("No valid Geo-Transform for this dataset, cannot get corner coordinates");
         }
 
-        // We need to get the X and Y pixel resolution of the image first
+        // We need the width and height of the raster to compute pixel coordinates.
         int width = dataset.getRasterXSize();
         int height = dataset.getRasterYSize();
 
-        // Use our helper function to convert into coordinates
+        // Convert corner pixel locations to geographic coordinates
         double[] topLeft = pixelToGeo(geoTransform, 0, 0);
         double[] topRight = pixelToGeo(geoTransform, width, 0);
         double[] bottomLeft = pixelToGeo(geoTransform, 0, height);
         double[] bottomRight = pixelToGeo(geoTransform, width, height);
 
-        cornerCoordinates.put("Top Left", "(" + topLeft[0] + ", " + topLeft[1] + ")");
-        cornerCoordinates.put("Top Right", "(" + topRight[0] + ", " + topRight[1] + ")");
-        cornerCoordinates.put("Bottom Left", "(" + bottomLeft[0] + ", " + bottomLeft[1] + ")");
+        // Compute center coordinate
+        int centerX = width / 2;
+        int centerY = height / 2;
+        double[] center = pixelToGeo(geoTransform, centerX, centerY);
+
+        cornerCoordinates.put("Top Left",     "(" + topLeft[0]     + ", " + topLeft[1]     + ")");
+        cornerCoordinates.put("Top Right",    "(" + topRight[0]    + ", " + topRight[1]    + ")");
+        cornerCoordinates.put("Bottom Left",  "(" + bottomLeft[0]  + ", " + bottomLeft[1]  + ")");
         cornerCoordinates.put("Bottom Right", "(" + bottomRight[0] + ", " + bottomRight[1] + ")");
+        cornerCoordinates.put("Center",       "(" + center[0]      + ", " + center[1]      + ")");
 
         return cornerCoordinates;
     }
-
     private double[] pixelToGeo(double[] geoTransform, int pixelX, int pixelY) {
 
         // Helper function to convert geoTransform data to corner coordinates
