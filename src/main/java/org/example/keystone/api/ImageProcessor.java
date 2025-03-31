@@ -1,13 +1,20 @@
 package org.example.keystone.api;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
 import javax.imageio.spi.IIORegistry;
+import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
+import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.RenderedOp;
 
 import javafx.scene.image.Image;
@@ -100,4 +107,46 @@ public class ImageProcessor {
 
         return SwingFXUtils.toFXImage(bufferedImage, null);
     }
+
+    public static Image getImage(File imageFile) {
+
+        try {
+            BufferedImage bufferedImage = loadSubsampledImage(imageFile, 4);
+            return SwingFXUtils.toFXImage(bufferedImage, null);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+
+    public static BufferedImage loadSubsampledImage(File file, int stepSize) throws Exception {
+        try (ImageInputStream iis = ImageIO.createImageInputStream(file)) {
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+            if (!readers.hasNext()) {
+                throw new RuntimeException("No image reader found for file: " + file.getName());
+            }
+
+            ImageReader reader = readers.next();
+            reader.setInput(iis, true, true);
+
+            ImageReadParam param = reader.getDefaultReadParam();
+            param.setSourceSubsampling(stepSize, stepSize, 0, 0); // Skip pixels in both directions
+
+            BufferedImage image = reader.read(0, param);
+            reader.dispose();
+
+            return image;
+        }
+    }
+
+    public static boolean isLargeImage(File file) {
+        boolean isLarge = false;
+        long bytes = file.length();
+        int megabytes = (int)(bytes / (1024.0 * 1024.0));
+        if (megabytes > 1000) {
+            isLarge = true;
+        }
+        return isLarge;
+    }
+
 }
