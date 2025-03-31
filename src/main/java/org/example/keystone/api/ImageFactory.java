@@ -21,7 +21,9 @@ public class ImageFactory {
             throw new IllegalArgumentException("File extension error: null");
         }
         return switch (fileExtension) {
-            case "jpg", "png", "tif", "TIF", "ntf" -> ImageProcessor.isLargeImage(file) ? ImageProcessor.getSubsampledBufferedImage(file) : ImageProcessor.getBufferedImage(file);
+            case "jpg", "png" -> ImageProcessor.isLargeImage(file) ? ImageProcessor.getImage(file) : new Image(file.toURI().toString());
+            case "tif", "TIF" -> ImageProcessor.isLargeImage(file) ? ImageProcessor.getImage(file) : ImageProcessor.getBufferedImageGeoTiff(file);
+            case "ntf" -> ImageProcessor.isLargeImage(file) ? ImageProcessor.getBufferedImageNitfSubsampled(file) : ImageProcessor.getBufferedImageNitf(file);
             default -> throw new IllegalStateException("Unsupported file type: " + fileExtension);
         };
     }
