@@ -108,6 +108,70 @@ public class ImageProcessor {
         return SwingFXUtils.toFXImage(bufferedImage, null);
     }
 
+    public static Image getBufferedImageNitfSubsampled(File file) {
+        gdal.AllRegister();
+        Dataset dataset = gdal.Open(file.getAbsolutePath());
+        if (dataset == null) {
+            throw new RuntimeException("Failed to open file with GDAL: " + file.getAbsolutePath());
+        }
+
+        int width = dataset.getRasterXSize();
+        int height = dataset.getRasterYSize();
+        int bands = dataset.getRasterCount();
+
+        if (bands < 1) {
+            throw new RuntimeException("Image has no raster bands.");
+        }
+
+        int step = 4;
+        int subsampledWidth = width / step;
+        int subsampledHeight = height / step;
+
+        BufferedImage bufferedImage;
+
+        if (bands >= 3) {
+            bufferedImage = new BufferedImage(subsampledWidth, subsampledHeight, BufferedImage.TYPE_INT_RGB);
+            WritableRaster raster = bufferedImage.getRaster();
+
+            Band redBand = dataset.GetRasterBand(1);
+            Band greenBand = dataset.GetRasterBand(2);
+            Band blueBand = dataset.GetRasterBand(3);
+
+            int[] rFull = new int[width];
+            int[] gFull = new int[width];
+            int[] bFull = new int[width];
+
+            for (int y = 0, j = 0; y < height && j < subsampledHeight; y += step, j++) {
+                redBand.ReadRaster(0, y, width, 1, rFull);
+                greenBand.ReadRaster(0, y, width, 1, gFull);
+                blueBand.ReadRaster(0, y, width, 1, bFull);
+
+                for (int x = 0, i = 0; x < width && i < subsampledWidth; x += step, i++) {
+                    int[] pixel = {rFull[x], gFull[x], bFull[x]};
+                    raster.setPixel(i, j, pixel);
+                }
+            }
+        } else {
+            bufferedImage = new BufferedImage(subsampledWidth, subsampledHeight, BufferedImage.TYPE_BYTE_GRAY);
+            WritableRaster raster = bufferedImage.getRaster();
+
+            Band grayBand = dataset.GetRasterBand(1);
+            int[] rowFull = new int[width];
+
+            for (int y = 0, j = 0; y < height && j < subsampledHeight; y += step, j++) {
+                grayBand.ReadRaster(0, y, width, 1, rowFull);
+
+                for (int x = 0, i = 0; x < width && i < subsampledWidth; x += step, i++) {
+                    raster.setSample(i, j, 0, rowFull[x]);
+                }
+            }
+        }
+
+        return SwingFXUtils.toFXImage(bufferedImage, null);
+    }
+
+
+
     public static Image getImage(File imageFile) {
 
         try {
