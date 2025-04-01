@@ -5,6 +5,8 @@ import org.gdal.gdal.InfoOptions;
 import org.gdal.gdal.gdal;
 import org.gdal.gdalconst.gdalconstConstants;
 import org.gdal.osr.SpatialReference;
+import org.gdal.gdal.Driver;
+import org.gdal.gdalconst.gdalconst;
 
 import java.io.File;
 import java.util.Hashtable;
@@ -385,6 +387,31 @@ public abstract class MetadataDecoder {
         double geoY = geoTransform[3] + pixelX * geoTransform[4] + pixelY * geoTransform[5];
         return new double[]{geoX, geoY};
     }
+
+    /**
+     * Converts the current file to GeoTIFF format
+     * @param outputFile Target GeoTIFF file
+     * @throws Exception If conversion fails
+     */
+    public void convertToGeoTiff(File outputFile) throws Exception {
+        Driver driver = gdal.GetDriverByName("GTiff");
+        Dataset dstDs = driver.CreateCopy(outputFile.getAbsolutePath(), this.dataset);
+        if (dstDs == null) throw new Exception(gdal.GetLastErrorMsg());
+        dstDs.delete();
+        this.file = outputFile;
+        this.dataset = gdal.Open(outputFile.getAbsolutePath(), gdalconst.GA_Update);
+    }
+
+    /**
+     * Writes spatial reference to current GeoTIFF file
+     * @param srs SpatialReference to write
+     * @throws Exception If writing fails
+     */
+    protected void writeSpatialReferenceToGeoTiff(SpatialReference srs) throws Exception {
+        this.dataset.SetProjection(srs.ExportToWkt());
+        this.dataset.FlushCache();
+    }
+
 
 
         

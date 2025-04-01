@@ -37,5 +37,14 @@ public class NitfDecoder extends MetadataDecoder {
 
     public void setSpatialReference(SpatialReference srs) {
         this.dataset.SetSpatialRef(srs);
+        try {
+            if (!this.file.getName().endsWith(".tif")) {
+                File geoTiff = new File(this.file.getParent(), "converted.tif");
+                convertToGeoTiff(geoTiff);  // Now the method will be "used"
+            }
+            writeSpatialReferenceToGeoTiff(srs);  // Now the method will be "used"
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
