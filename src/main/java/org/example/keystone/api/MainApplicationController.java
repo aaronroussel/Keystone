@@ -106,6 +106,7 @@ public class MainApplicationController implements Initializable {
                 File cellFile = cell.getItem();
                 if (!cellFile.isDirectory()) {
                     String filePath = cellFile.getAbsolutePath();
+                    imageViewer.setImage(null);
                     try {
                         Image image = ImageFactory.getFXImage(cellFile);
                         imageViewer.setImage(image);
