@@ -12,6 +12,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.input.MouseEvent;
@@ -68,6 +69,11 @@ public class MainApplicationController implements Initializable {
     public TreeTableColumn<XMLTreeNode, String> metadataTableValueCol;
     //public TreeTableColumn<MetadataEntry, String> metadataTableValueCol;
 
+    @FXML
+    public AnchorPane imagePreviewAnchorPane;
+
+
+
     public String directoryPath = "src/images/";
     
 
@@ -108,7 +114,11 @@ public class MainApplicationController implements Initializable {
                     String filePath = cellFile.getAbsolutePath();
                     try {
                         Image image = ImageFactory.getFXImage(cellFile);
+
                         imageViewer.setImage(image);
+
+                        imageViewer.fitWidthProperty().bind(imagePreviewAnchorPane.widthProperty());
+
                     } catch (Exception e) {
                         System.err.println("Error Loading Image: " + e);
                     }
@@ -173,6 +183,5 @@ public class MainApplicationController implements Initializable {
         metadataTable.setShowRoot(false);
 
     }
-
 
 }

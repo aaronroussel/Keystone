@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.Menu?>
@@ -9,10 +10,13 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TreeTableColumn?>
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox alignment="TOP_CENTER" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.keystone.api.MainApplicationController">
@@ -37,8 +41,8 @@
           </Menu>
           <Menu mnemonicParsing="false" text="View">
                <items>
-                  <CheckMenuItem mnemonicParsing="false" text="Meta Data" />
-                  <CheckMenuItem mnemonicParsing="false" text="Image Preview" />
+                  <CheckMenuItem id="menuShowMetadata" fx:id="menuShowMetadata" mnemonicParsing="false" onAction="#viewCheckedMetadata" text="Meta Data" />
+                  <CheckMenuItem id="menuShowImagePreview" fx:id="menuShowImagePreview" mnemonicParsing="false" onAction="#viewCheckedImagePreview" text="Image Preview" />
                </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Tools" />
@@ -80,16 +84,37 @@
             <Insets />
          </VBox.margin>
       </MenuBar>
-      <SplitPane id="FileScrollPane" dividerPositions="0.5" prefHeight="1102.0" prefWidth="1964.0" VBox.vgrow="ALWAYS">
+      <SplitPane id="FileScrollPane" dividerPositions="0.35" prefHeight="1102.0" prefWidth="1964.0" VBox.vgrow="ALWAYS">
         <items>
-            <TreeView fx:id="fileDirectoryTreeView" prefHeight="776.0" prefWidth="324.0" />
-            <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+            <TabPane prefHeight="1053.0" prefWidth="1094.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Browse">
+                     <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <TreeView fx:id="fileDirectoryTreeView" prefHeight="1028.0" prefWidth="1920.0" />
+                           </children></AnchorPane>
+                     </content>
+                </Tab>
+                <Tab text="Preview">
+                  <content>
+                    <AnchorPane fx:id="imagePreviewAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="1024.0" prefWidth="662.0">
+                           <children>
+                              <ImageView fx:id="imageViewer" fitHeight="1025.0" fitWidth="668.0" pickOnBounds="true" preserveRatio="true">
+                                 <cursor>
+                                    <Cursor fx:constant="DEFAULT" />
+                                 </cursor>
+                                 <viewport>
+                                    <Rectangle2D />
+                                 </viewport>
+                              </ImageView>
+                           </children></AnchorPane>
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+            <SplitPane id="imagePane" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
                <items>
-                  <ImageView fx:id="imageViewer" fitHeight="500.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
-                  </ImageView>
                   <TreeTableView fx:id="metadataTable" prefHeight="1051.0" prefWidth="1041.0">
                     <columns>
                       <TreeTableColumn fx:id="metadataTableKeyCol" editable="false" minWidth="0.0" prefWidth="550.0" text="Key" />
