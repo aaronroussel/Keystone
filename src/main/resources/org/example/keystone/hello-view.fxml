@@ -41,8 +41,8 @@
           </Menu>
           <Menu mnemonicParsing="false" text="View">
                <items>
-                  <CheckMenuItem id="menuShowMetadata" fx:id="menuShowMetadata" mnemonicParsing="false" onAction="#viewCheckedMetadata" text="Meta Data" />
-                  <CheckMenuItem id="menuShowImagePreview" fx:id="menuShowImagePreview" mnemonicParsing="false" onAction="#viewCheckedImagePreview" text="Image Preview" />
+                  <CheckMenuItem id="menuShowMetadata" fx:id="menuShowMetadata" mnemonicParsing="false" text="Meta Data" />
+                  <CheckMenuItem id="menuShowImagePreview" fx:id="menuShowImagePreview" mnemonicParsing="false" text="Image Preview" />
                </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Tools" />
@@ -84,21 +84,28 @@
             <Insets />
          </VBox.margin>
       </MenuBar>
-      <SplitPane id="FileScrollPane" dividerPositions="0.35" prefHeight="1102.0" prefWidth="1964.0" VBox.vgrow="ALWAYS">
+      <SplitPane id="FileScrollPane" dividerPositions="0.5" prefHeight="1102.0" prefWidth="1964.0" VBox.vgrow="ALWAYS">
         <items>
-            <TabPane prefHeight="1053.0" prefWidth="1094.0" tabClosingPolicy="UNAVAILABLE">
+            <TreeView fx:id="fileDirectoryTreeView" prefHeight="1028.0" prefWidth="1920.0" />
+            <TabPane prefHeight="1053.0" prefWidth="1299.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
                 <Tab text="Browse">
-                     <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <TreeView fx:id="fileDirectoryTreeView" prefHeight="1028.0" prefWidth="1920.0" />
-                           </children></AnchorPane>
-                     </content>
+                              <TreeTableView fx:id="metadataTable" prefHeight="1051.0" prefWidth="1331.0">
+                                <columns>
+                                  <TreeTableColumn fx:id="metadataTableKeyCol" editable="false" minWidth="0.0" prefWidth="550.0" text="Key" />
+                                  <TreeTableColumn fx:id="metadataTableValueCol" prefWidth="304.0" text="Value" />
+                                </columns>
+                              </TreeTableView>
+                           </children>
+                        </AnchorPane>
+                  </content>
                 </Tab>
                 <Tab text="Preview">
                   <content>
-                    <AnchorPane fx:id="imagePreviewAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="1024.0" prefWidth="662.0">
+                    <AnchorPane fx:id="imagePreviewAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
                               <ImageView fx:id="imageViewer" fitHeight="1025.0" fitWidth="668.0" pickOnBounds="true" preserveRatio="true">
                                  <cursor>
@@ -108,21 +115,12 @@
                                     <Rectangle2D />
                                  </viewport>
                               </ImageView>
-                           </children></AnchorPane>
+                           </children>
+                        </AnchorPane>
                   </content>
                 </Tab>
               </tabs>
             </TabPane>
-            <SplitPane id="imagePane" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
-               <items>
-                  <TreeTableView fx:id="metadataTable" prefHeight="1051.0" prefWidth="1041.0">
-                    <columns>
-                      <TreeTableColumn fx:id="metadataTableKeyCol" editable="false" minWidth="0.0" prefWidth="550.0" text="Key" />
-                      <TreeTableColumn fx:id="metadataTableValueCol" prefWidth="304.0" text="Value" />
-                    </columns>
-                  </TreeTableView>
-               </items>
-            </SplitPane>
         </items>
       </SplitPane>
    </children>
