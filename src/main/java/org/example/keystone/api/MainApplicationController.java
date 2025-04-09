@@ -12,6 +12,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.input.MouseEvent;
@@ -68,6 +69,11 @@ public class MainApplicationController implements Initializable {
     public TreeTableColumn<XMLTreeNode, String> metadataTableValueCol;
     //public TreeTableColumn<MetadataEntry, String> metadataTableValueCol;
 
+    @FXML
+    public AnchorPane imagePreviewAnchorPane;
+
+
+
     public String directoryPath = "src/images/";
     
 
@@ -76,9 +82,16 @@ public class MainApplicationController implements Initializable {
         welcomeText.setText("Welcome to JavaFX Application!");
     }
 
+    // bind width to allow resizing with splitpane
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        imageViewer.fitWidthProperty().bind(imagePreviewAnchorPane.widthProperty());
 
+
+        metadataTable.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty());
+
+        metadataTableKeyCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
+        metadataTableValueCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
     }
 
 
@@ -104,12 +117,17 @@ public class MainApplicationController implements Initializable {
             });
             cell.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
                 File cellFile = cell.getItem();
-                if (!cellFile.isDirectory()) {
+
+
+
+                if (cellFile != null && !cellFile.isDirectory()) {
                     String filePath = cellFile.getAbsolutePath();
                     imageViewer.setImage(null);
                     try {
                         Image image = ImageFactory.getFXImage(cellFile);
+
                         imageViewer.setImage(image);
+
                     } catch (Exception e) {
                         System.err.println("Error Loading Image: " + e);
                     }
@@ -174,6 +192,5 @@ public class MainApplicationController implements Initializable {
         metadataTable.setShowRoot(false);
 
     }
-
 
 }
