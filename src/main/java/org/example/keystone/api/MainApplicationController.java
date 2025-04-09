@@ -122,14 +122,9 @@ public class MainApplicationController implements Initializable {
 
                 if (cellFile != null && !cellFile.isDirectory()) {
                     String filePath = cellFile.getAbsolutePath();
-                    try {
-                        Image image = ImageFactory.getFXImage(cellFile);
-
-                        imageViewer.setImage(image);
-
-                    } catch (Exception e) {
-                        System.err.println("Error Loading Image: " + e);
-                    }
+                    imageViewer.setImage(null);
+                    ImageFetcher imageFetcher = new ImageFetcher(imageViewer, cellFile);
+                    new Thread(imageFetcher).start();
                     MetadataTreeBuilder.buildTree(filePath, metadataTable, metadataTableKeyCol, metadataTableValueCol);
                 }
             });
@@ -190,6 +185,26 @@ public class MainApplicationController implements Initializable {
         metadataTable.setRoot(topNode);
         metadataTable.setShowRoot(false);
 
+    }
+
+
+    public static class ImageFetcher implements Runnable {
+        ImageView imageView;
+        File file;
+
+        ImageFetcher(ImageView imageView, File file) {
+            this.imageView = imageView;
+            this.file = file;
+        }
+
+        public void run() {
+            try {
+                Image image = ImageFactory.getFXImage(this.file);
+                this.imageView.setImage(image);
+            } catch (Exception e) {
+                System.err.println("Error loading image: " + e);
+            }
+        }
     }
 
 }
