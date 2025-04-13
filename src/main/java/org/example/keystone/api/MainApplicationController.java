@@ -6,7 +6,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.cell.TextFieldTreeCell;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -14,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 
@@ -98,7 +101,17 @@ public class MainApplicationController implements Initializable {
 
         editMetadataTableKeyCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
         editMetadataTableValueCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
+
+
+
+        editMetadataTableValueCol.setEditable(true);
+
+
+
+
+
     }
+
 
 
     private void populateFileDirectoryTreeView(File directory) {
@@ -125,7 +138,6 @@ public class MainApplicationController implements Initializable {
                 File cellFile = cell.getItem();
 
 
-
                 if (cellFile != null && !cellFile.isDirectory()) {
                     String filePath = cellFile.getAbsolutePath();
                     try {
@@ -137,7 +149,8 @@ public class MainApplicationController implements Initializable {
                         System.err.println("Error Loading Image: " + e);
                     }
                     browseMetadataTreeBuilder.buildTree(filePath, browseMetadataTable, browseMetadataTableKeyCol, browseMetadataTableValueCol);
-                    browseMetadataTreeBuilder.buildTree(filePath, editMetadataTable, editMetadataTableKeyCol, editMetadataTableValueCol);
+                    editMetadataTreeBuilder.buildTree(filePath, editMetadataTable, editMetadataTableKeyCol, editMetadataTableValueCol);
+
                 }
             });
 

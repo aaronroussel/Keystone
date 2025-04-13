@@ -1,8 +1,11 @@
 package org.example.keystone.api;
 
+import com.sun.source.tree.Tree;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
 import org.gdal.gdal.XMLNode;
 import org.gdal.gdal.gdal;
 
@@ -54,6 +57,59 @@ public class editMetadataTreeBuilder {
 
                 metadataTableKeyCol.setCellValueFactory(param -> param.getValue().getValue().nodeNameProperty());
                 metadataTableValueCol.setCellValueFactory(param -> param.getValue().getValue().nodeValueProperty());
+
+
+                // code to turn value column into text fields and make them editable
+                metadataTable.setEditable(true);
+
+                metadataTableValueCol.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+
+                metadataTableValueCol.setOnEditCommit(event -> {
+                    TreeItem <XMLTreeNode> currentEditingMetadata = metadataTable.getTreeItem(event.getTreeTablePosition().getRow());
+
+                    XMLTreeNode treeNode = currentEditingMetadata.getValue();
+
+                    treeNode.setNodeValue(event.getNewValue());
+
+                    String metadataKey = treeNode.nodeNameProperty().get();
+                    String metadataValue = treeNode.nodeValueProperty().get();
+
+
+                    String extension = "";
+
+                    int i = filePath.lastIndexOf('.');
+                    if (i > 0) {
+                        extension = filePath.substring(i+1);
+                    }
+
+                    System.out.println(extension);
+
+                    switch (extension) {
+                        case "tif":
+                            TiffDecoder tiffDecoder = new TiffDecoder(file, metadataDecoder.dataset);
+
+                            tiffDecoder.setMetadataField(metadataKey, metadataValue);
+                            //tiffDecoder.setMetadataFromHashTable(metadataDecoder.getMetadataHashTable(domain););
+                            break;
+                        case "ntf":
+                            NitfDecoder ntfDecoder = new NitfDecoder(file, metadataDecoder.dataset);
+
+                            ntfDecoder.setMetadataField(metadataKey, metadataValue);
+                            break;
+                        case "jpeg":
+                            JpegDecoder jpegDecoder = new JpegDecoder(file, metadataDecoder.dataset);
+
+                            jpegDecoder.setMetadataField(metadataKey, metadataValue);
+                            break;
+                    }
+
+
+                });
+
+
+
+
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
