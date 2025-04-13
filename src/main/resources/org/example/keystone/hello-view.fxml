@@ -93,16 +93,30 @@
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <TreeTableView fx:id="metadataTable" prefHeight="1051.0" prefWidth="1331.0">
+                              <TreeTableView fx:id="browseMetadataTable" prefHeight="1051.0" prefWidth="1331.0">
                                 <columns>
-                                  <TreeTableColumn fx:id="metadataTableKeyCol" editable="false" minWidth="0.0" prefWidth="550.0" text="Key" />
-                                  <TreeTableColumn fx:id="metadataTableValueCol" prefWidth="304.0" text="Value" />
+                                  <TreeTableColumn fx:id="browseMetadataTableKeyCol" editable="false" minWidth="0.0" prefWidth="550.0" text="Key" />
+                                  <TreeTableColumn fx:id="browseMetadataTableValueCol" prefWidth="304.0" text="Value" />
                                 </columns>
                               </TreeTableView>
                            </children>
                         </AnchorPane>
                   </content>
                 </Tab>
+                  <Tab text="Edit">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TreeTableView fx:id="editMetadataTable" prefHeight="1051.0" prefWidth="1331.0">
+                                 <columns>
+                                    <TreeTableColumn fx:id="editMetadataTableKeyCol" editable="false" minWidth="0.0" prefWidth="550.0" text="Key" />
+                                    <TreeTableColumn fx:id="editMetadataTableValueCol" prefWidth="304.0" text="Value" />
+                                 </columns>
+                              </TreeTableView>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
                 <Tab text="Preview">
                   <content>
                     <AnchorPane fx:id="imagePreviewAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">

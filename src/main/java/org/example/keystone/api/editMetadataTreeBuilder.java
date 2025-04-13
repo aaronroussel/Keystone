@@ -1,11 +1,8 @@
 package org.example.keystone.api;
 
-import com.sun.source.tree.Tree;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
-import org.gdal.gdal.Dataset;
 import org.gdal.gdal.XMLNode;
 import org.gdal.gdal.gdal;
 
@@ -13,7 +10,7 @@ import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
 
-public class MetadataTreeBuilder {
+public class editMetadataTreeBuilder {
 
     public static void buildTree(String filePath, TreeTableView<XMLTreeNode> metadataTable, TreeTableColumn<XMLTreeNode, String> metadataTableKeyCol, TreeTableColumn<XMLTreeNode, String> metadataTableValueCol) {
             try {
