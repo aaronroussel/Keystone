@@ -34,9 +34,10 @@ public abstract class MetadataDecoder {
     //                              ----------------------WORK IN PROGRESS--------------------------
     protected Dataset dataset;
     protected File file;
+    private final ImageProcessor imageProcessor;
 
-    MetadataDecoder(File file, Dataset dataset) {
-
+    MetadataDecoder(File file, Dataset dataset, ImageProcessor imageProcessor) {
+        this.imageProcessor = imageProcessor;
         if (!file.isFile()) {
             throw new IllegalArgumentException("Cannot instantiate object: " + file.getName() + " is not a valid file");
         }
@@ -92,6 +93,8 @@ public abstract class MetadataDecoder {
         return metadataList;
 
     }
+
+
 
     public void getDataset() {
         // used by the constructor to obtain a dataset from the input file object
@@ -391,7 +394,23 @@ public abstract class MetadataDecoder {
     
     public abstract void setSpatialReference(SpatialReference srs);
 
-    public abstract void setSpatialReferenceFromWKT(String wktString);
+    public void setSpatialReferenceFromWKT(String wktString){
+
+        try {
+            //1. convert to Geotiff
+            if (!this.file.getName().endsWith(".tif")) {
+                File geoTiff = new File(this.file.getParent(), "converted.tif");
+                this.file = imageProcessor.convertToGeoTiff(geoTiff);  // Now the method will be "used"
+            }
+            // 2. Directly set spatial reference
+            SpatialReference srs = new SpatialReference(wktString);
+            this.dataset.SetSpatialRef(srs);  // GDAL native call
+            this.dataset.FlushCache();        // Ensure changes persist
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public abstract void setMetadataField(String key, String value);
 

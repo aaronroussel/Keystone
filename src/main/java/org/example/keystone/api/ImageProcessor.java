@@ -21,12 +21,15 @@ import javafx.scene.image.Image;
 import javafx.embed.swing.SwingFXUtils;
 import org.gdal.gdal.Band;
 import org.gdal.gdal.Dataset;
+import org.gdal.gdal.Driver;
 import org.gdal.gdal.gdal;
 import org.gdal.gdalconst.gdalconst;
 
 public class ImageProcessor {
 
-   public static Image getBufferedImage(File file) {
+    private Dataset dataset;
+
+    public static Image getBufferedImage(File file) {
         gdal.AllRegister();
         Dataset dataset = gdal.Open(file.getAbsolutePath());
         if (dataset == null) {
@@ -93,6 +96,19 @@ public class ImageProcessor {
 
         return SwingFXUtils.toFXImage(bufferedImage, null);
    }
+
+    public  File convertToGeoTiff(File outputFile) throws Exception {
+        Dataset dstDs = null;
+        try {
+            dstDs = gdal.GetDriverByName("GTiff").CreateCopy(outputFile.getAbsolutePath(), this.dataset);
+            if (dstDs == null) throw new Exception(gdal.GetLastErrorMsg());
+            return outputFile;
+        } finally {
+            if (dstDs != null) dstDs.delete(); // Cleanup in finally block
+        }
+    }
+
+
 
     public static Image getSubsampledBufferedImage(File file) {
         int stepSize = getStepSize(file);

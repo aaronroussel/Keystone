@@ -7,7 +7,7 @@ import org.gdal.gdalconst.gdalconstConstants;
 import java.io.File;
 
 public class MetadataDecoderFactory {
-    public static MetadataDecoder createDecoder(File file) {
+    public static MetadataDecoder createDecoder(File file, ImageProcessor imageProcessor) {
 
         /*
             Factory class for creating new MetadataDecoder objects based on file type
@@ -19,9 +19,9 @@ public class MetadataDecoderFactory {
         }
 
         return switch (fileType) {
-            case "tif", "TIF" -> new TiffDecoder(file, getDataset(file, true));
-            case "ntf" -> new NitfDecoder(file, getDataset(file, true));
-            case "jpg" -> new JpegDecoder(file, getDataset(file, false));
+            case "tif", "TIF" -> new TiffDecoder(file, getDataset(file, true), imageProcessor);
+            case "ntf" -> new NitfDecoder(file, getDataset(file, true), imageProcessor);
+            case "jpg" -> new JpegDecoder(file, getDataset(file, false), imageProcessor);
             case "png" -> null;
             default -> throw new UnsupportedOperationException("Unsupported File Type: " + fileType);
         };

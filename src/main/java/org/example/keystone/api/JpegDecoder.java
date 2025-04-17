@@ -8,8 +8,8 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 public class JpegDecoder extends MetadataDecoder {
-    JpegDecoder(File file, Dataset dataset) {
-        super(file, dataset);
+    JpegDecoder(File file, Dataset dataset, ImageProcessor imageprocessor) {
+        super(file, dataset, imageprocessor);
     }
 
     @Override

@@ -9,10 +9,10 @@ import java.util.Hashtable;
 
 public class TiffDecoder extends MetadataDecoder {
 
-    public TiffDecoder(File file, Dataset dataset) {
-        super(file, dataset);
+    public TiffDecoder(File file, Dataset dataset, ImageProcessor imageProcessor) {
+        super(file, dataset, imageProcessor);
     }
-
+    @Override
     public void setSpatialReferenceFromWKT(String wktString) {
         /*
             Takes a string in WKT format and creates a new spatial reference then writes it to the dataset. This can
@@ -22,6 +22,7 @@ public class TiffDecoder extends MetadataDecoder {
         super.dataset.SetSpatialRef(spatialReference);
     }
 
+    @Override
     public void setSpatialReference(SpatialReference srs) {
         super.dataset.SetSpatialRef(srs);
     }
