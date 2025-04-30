@@ -5,7 +5,7 @@ import javafx.scene.image.Image;
 import java.io.File;
 
 public class ImageFactory {
-    // 800 MB max memory cache, maybe can be adjusted by the user
+    // 800 MB max memory cache, maybe can be adjusted by the user later
     private static final MemoryBoundImageCache cache = new MemoryBoundImageCache(800 * 1024 * 1024);
 
     public static Image getFXImage(File file) {
