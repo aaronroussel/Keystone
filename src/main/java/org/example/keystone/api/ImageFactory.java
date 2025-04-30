@@ -16,7 +16,7 @@ public class ImageFactory {
         }
 
         return switch (fileExtension) {
-            case "jpg", "png", "tif", "TIF", "ntf" -> {
+            case "jpg", "tif", "TIF", "ntf" -> {
                 if (ImageProcessor.isLargeImage(file)) {
 
                     Image cached = cache.get(file);
@@ -29,6 +29,9 @@ public class ImageFactory {
                 } else {
                     yield ImageProcessor.getBufferedImage(file);
                 }
+            }
+            case "png" -> {
+                yield ImageProcessor.getVectorBufferedImage(file);
             }
             default -> throw new IllegalStateException("Unsupported file type: " + fileExtension);
         };
