@@ -72,6 +72,10 @@ public class MainApplicationController implements Initializable {
     @FXML
     public AnchorPane imagePreviewAnchorPane;
 
+    @FXML
+    private ProgressIndicator loadingSpinner;
+
+
 
 
     public String directoryPath = "src/images/";
@@ -123,7 +127,10 @@ public class MainApplicationController implements Initializable {
                 if (cellFile != null && !cellFile.isDirectory()) {
                     String filePath = cellFile.getAbsolutePath();
                     imageViewer.setImage(null);
-                    ImageFetcher imageFetcher = new ImageFetcher(imageViewer, cellFile);
+                    Platform.runLater(() -> loadingSpinner.setVisible(true));  // Show spinner
+                    ImageFetcher imageFetcher = new ImageFetcher(imageViewer, cellFile, () -> {
+                        Platform.runLater(() -> loadingSpinner.setVisible(false)); // Hide spinner
+                    });
                     new Thread(imageFetcher).start();
                     MetadataTreeBuilder.buildTree(filePath, metadataTable, metadataTableKeyCol, metadataTableValueCol);
                 }
@@ -189,20 +196,34 @@ public class MainApplicationController implements Initializable {
 
 
     public static class ImageFetcher implements Runnable {
-        ImageView imageView;
-        File file;
+        private final ImageView imageView;
+        private final File file;
+        private final Runnable onDone;
 
-        ImageFetcher(ImageView imageView, File file) {
+        public ImageFetcher(ImageView imageView, File file, Runnable onDone) {
             this.imageView = imageView;
             this.file = file;
+            this.onDone = onDone;
         }
 
+        @Override
         public void run() {
             try {
                 Image image = ImageFactory.getFXImage(this.file);
-                this.imageView.setImage(image);
+
+                Platform.runLater(() -> {
+                    imageView.setImage(image);
+                    if (onDone != null) {
+                        onDone.run();  // Hide spinner
+                    }
+                });
             } catch (Exception e) {
                 System.err.println("Error loading image: " + e);
+                Platform.runLater(() -> {
+                    if (onDone != null) {
+                        onDone.run();  // Still hide spinner if an error occurs
+                    }
+                });
             }
         }
     }

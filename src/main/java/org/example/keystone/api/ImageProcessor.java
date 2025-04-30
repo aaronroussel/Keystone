@@ -186,7 +186,7 @@ public class ImageProcessor {
    }
 
     public static int getStepSize(File file) {
-        long MAX_MEMORY_USAGE_BYTES = 300L * 1024 * 1024;
+        long MAX_MEMORY_USAGE_BYTES = 200L * 1024 * 1024;
         int BYTES_PER_PIXEL = 3;
 
         long fileSizeBytes = file.length();
