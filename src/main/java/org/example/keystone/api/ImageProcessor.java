@@ -24,11 +24,11 @@ import org.gdal.gdal.Band;
 import org.gdal.gdal.Dataset;
 import org.gdal.gdal.gdal;
 import org.gdal.gdalconst.gdalconst;
+import org.gdal.gdalconst.gdalconstConstants;
 
 public class ImageProcessor {
 
    public static Image getBufferedImage(File file) {
-        gdal.AllRegister();
         Dataset dataset = gdal.Open(file.getAbsolutePath());
         if (dataset == null) {
             throw new RuntimeException("Failed to open file with GDAL: " + file.getAbsolutePath());
@@ -97,7 +97,6 @@ public class ImageProcessor {
 
     public static Image getSubsampledBufferedImage(File file) {
         int stepSize = getStepSize(file);
-        gdal.AllRegister();
         Dataset dataset = gdal.Open(file.getAbsolutePath());
         if (dataset == null) {
             throw new RuntimeException("Failed to open file with GDAL: " + file.getAbsolutePath());
