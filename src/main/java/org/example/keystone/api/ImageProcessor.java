@@ -2,6 +2,7 @@ package org.example.keystone.api;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
@@ -23,11 +24,14 @@ import org.gdal.gdal.Band;
 import org.gdal.gdal.Dataset;
 import org.gdal.gdal.gdal;
 import org.gdal.gdalconst.gdalconst;
+import org.gdal.gdalconst.gdalconstConstants;
 
 public class ImageProcessor {
 
+   private static long maxSubsampledImageSizeInMB = 100L;
+
    public static Image getBufferedImage(File file) {
-        gdal.AllRegister();
+
         Dataset dataset = gdal.Open(file.getAbsolutePath());
         if (dataset == null) {
             throw new RuntimeException("Failed to open file with GDAL: " + file.getAbsolutePath());
@@ -95,8 +99,8 @@ public class ImageProcessor {
    }
 
     public static Image getSubsampledBufferedImage(File file) {
+       System.out.println(maxSubsampledImageSizeInMB);
         int stepSize = getStepSize(file);
-        gdal.AllRegister();
         Dataset dataset = gdal.Open(file.getAbsolutePath());
         if (dataset == null) {
             throw new RuntimeException("Failed to open file with GDAL: " + file.getAbsolutePath());
@@ -105,6 +109,8 @@ public class ImageProcessor {
         int width = dataset.getRasterXSize();
         int height = dataset.getRasterYSize();
         int bands = dataset.getRasterCount();
+
+        System.out.println("Width = " + width + ", Height = " + height);
 
         if (bands < 1) {
             throw new RuntimeException("Image has no raster bands.");
@@ -173,20 +179,58 @@ public class ImageProcessor {
     }
 
 
+    public static Image getVectorBufferedImage(File file) {
+        Dataset dataset = gdal.Open(file.getAbsolutePath());
+        if (dataset == null) {
+            System.err.println("Failed to load image: " + gdal.GetLastErrorMsg());
+            return null;
+        }
+
+        int width = dataset.getRasterXSize();
+        int height = dataset.getRasterYSize();
+        int bands = dataset.getRasterCount();
+
+        if (bands < 1 || bands > 4) {
+            System.err.println("Unsupported number of bands: " + bands);
+            dataset.delete();
+            return null;
+        }
+
+        BufferedImage bufferedImage = new BufferedImage(
+                width,
+                height,
+                bands == 4 ? BufferedImage.TYPE_4BYTE_ABGR : BufferedImage.TYPE_3BYTE_BGR
+        );
+
+        byte[] imageData = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
+
+        int[] channelMap = (bands == 4) ? new int[]{3, 2, 1, 0} : new int[]{2, 1, 0};
+
+        byte[] bandBuffer = new byte[width * height];
+
+        for (int i = 0; i < bands; i++) {
+            Band band = dataset.GetRasterBand(i + 1);
+            band.ReadRaster(0, 0, width, height, bandBuffer);
+
+            int channel = channelMap[i];
+            for (int j = 0; j < width * height; j++) {
+                imageData[j * bands + channel] = bandBuffer[j];
+            }
+        }
+
+        dataset.delete(); // Cleanup
+        return SwingFXUtils.toFXImage(bufferedImage, null);
+    }
 
 
-   public static boolean isLargeImage(File file) {
-       boolean isLarge = false;
-       long bytes = file.length();
-       int megabytes = (int)(bytes / (1024.0 * 1024.0));
-       if (megabytes > 1000) {
-           isLarge = true;
-       }
-       return isLarge;
-   }
+    public static boolean isLargeImage(File file) {
+        long bytes = file.length();
+        long threshold = maxSubsampledImageSizeInMB * 1024L * 1024L;
+        return bytes > threshold;
+    }
 
     public static int getStepSize(File file) {
-        long MAX_MEMORY_USAGE_BYTES = 300L * 1024 * 1024;
+        long MAX_MEMORY_USAGE_BYTES = maxSubsampledImageSizeInMB * 1024 * 1024;
         int BYTES_PER_PIXEL = 3;
 
         long fileSizeBytes = file.length();
@@ -198,6 +242,16 @@ public class ImageProcessor {
         double scaleFactor = Math.sqrt((double) totalPixels / maxPixelsAllowed);
         int stepSize = (int) Math.ceil(scaleFactor);
 
+        System.out.println(Math.max(stepSize, 1));
+
         return Math.max(stepSize, 1);
+    }
+
+    public static long getMaxSubsampledImageSizeInMB() {
+        return maxSubsampledImageSizeInMB;
+    }
+
+    public static void setMaxSubsampledImageSizeInMB(long maxSubsampledImageSizeInMB) {
+        ImageProcessor.maxSubsampledImageSizeInMB = maxSubsampledImageSizeInMB;
     }
 }
