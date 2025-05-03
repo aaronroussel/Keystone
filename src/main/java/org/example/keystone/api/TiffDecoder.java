@@ -40,7 +40,10 @@ public class TiffDecoder extends MetadataDecoder {
          */
 
         this.dataset.SetMetadataItem(key.toUpperCase(), value);
-        this.save();
+        this.dataset.FlushCache();
+        this.dataset.delete();
+        this.dataset = null;
+        this.getDataset();
     }
 
     public void setMetadataField(String key, String value, String domain) {

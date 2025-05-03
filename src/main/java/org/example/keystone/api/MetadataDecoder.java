@@ -42,7 +42,7 @@ public abstract class MetadataDecoder {
         }
 
         this.file = file;
-        getDataset();
+        this.dataset = dataset;
     }
 
     public Vector<String> getMetadata() {
@@ -416,6 +416,7 @@ public abstract class MetadataDecoder {
     }
 
     public void closeDataset() {
+        this.dataset.FlushCache();
         this.dataset.delete();
     }
 }

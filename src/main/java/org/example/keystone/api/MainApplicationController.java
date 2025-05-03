@@ -2,8 +2,10 @@ package org.example.keystone.api;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -15,17 +17,20 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
+import org.example.keystone.MainApplication;
+import org.gdal.gdal.XMLNode;
+import org.gdal.gdal.gdal;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-
 public class MainApplicationController implements Initializable {
-
     /*
                             This is the Main Application Controller
 
@@ -74,6 +79,10 @@ public class MainApplicationController implements Initializable {
 
     @FXML
     public AnchorPane imagePreviewAnchorPane;
+
+    @FXML
+    private ProgressIndicator loadingSpinner;
+
 
 
 
@@ -140,17 +149,14 @@ public class MainApplicationController implements Initializable {
 
                 if (cellFile != null && !cellFile.isDirectory()) {
                     String filePath = cellFile.getAbsolutePath();
-                    try {
-                        Image image = ImageFactory.getFXImage(cellFile);
-
-                        imageViewer.setImage(image);
-
-                    } catch (Exception e) {
-                        System.err.println("Error Loading Image: " + e);
-                    }
+                    imageViewer.setImage(null);
+                    Platform.runLater(() -> loadingSpinner.setVisible(true));  // Show spinner
+                    ImageFetcher imageFetcher = new ImageFetcher(imageViewer, cellFile, () -> {
+                        Platform.runLater(() -> loadingSpinner.setVisible(false)); // Hide spinner
+                    });
+                    new Thread(imageFetcher).start();
                     browseMetadataTreeBuilder.buildTree(filePath, browseMetadataTable, browseMetadataTableKeyCol, browseMetadataTableValueCol);
                     editMetadataTreeBuilder.buildTree(filePath, editMetadataTable, editMetadataTableKeyCol, editMetadataTableValueCol);
-
                 }
             });
 
@@ -214,5 +220,84 @@ public class MainApplicationController implements Initializable {
         editMetadataTable.setShowRoot(false);
 
     }
+
+
+    public static class ImageFetcher implements Runnable {
+        private final ImageView imageView;
+        private final File file;
+        private final Runnable onDone;
+
+        public ImageFetcher(ImageView imageView, File file, Runnable onDone) {
+            this.imageView = imageView;
+            this.file = file;
+            this.onDone = onDone;
+        }
+
+        @Override
+        public void run() {
+            try {
+                Image image = ImageFactory.getFXImage(this.file);
+
+                Platform.runLater(() -> {
+                    imageView.setImage(image);
+                    if (onDone != null) {
+                        onDone.run();  // Hide spinner
+                    }
+                });
+            } catch (Exception e) {
+                System.err.println("Error loading image: " + e);
+                Platform.runLater(() -> {
+                    if (onDone != null) {
+                        onDone.run();  // Still hide spinner if an error occurs
+                    }
+                });
+            }
+        }
+    }
+
+    public void openSettingsWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/keystone/SettingsDialog.fxml"));
+
+            DialogPane settingsPane = loader.load(); // NEW instance
+            SettingsController controller = loader.getController();
+
+
+            // ✅ Manually set current values BEFORE showing
+            controller.cacheSizeField.setText(String.valueOf(ImageFactory.getMaxCacheCapacityInMB()));
+            controller.subsampleSizeField.setText(String.valueOf(ImageProcessor.getMaxSubsampledImageSizeInMB()));
+
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("Settings");
+            dialog.setDialogPane(settingsPane);
+            dialog.initModality(Modality.APPLICATION_MODAL);
+
+
+            // Show the dialog and process result
+            Optional<ButtonType> result = dialog.showAndWait();
+            System.out.println("Dialog result: " + result);
+
+            if (result.isPresent() && result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                try {
+                    int cacheSize = Integer.parseInt(controller.cacheSizeField.getText());
+                    long subsampleSize = Long.parseLong(controller.subsampleSizeField.getText());
+
+                    ImageFactory.setMaxCacheCapacityInMB(cacheSize);
+                    ImageProcessor.setMaxSubsampledImageSizeInMB(subsampleSize);
+
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    // Optional: show error alert
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 
 }
