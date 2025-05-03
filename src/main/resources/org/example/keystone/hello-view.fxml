@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.keystone.api.MainApplicationController">
+<VBox alignment="TOP_CENTER" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.keystone.api.MainApplicationController">
    <children>
       <MenuBar prefHeight="0.0" prefWidth="1959.0" VBox.vgrow="ALWAYS">
         <menus>
@@ -36,7 +51,7 @@
             <Menu mnemonicParsing="false" text="Options">
                 <items>
                     <SeparatorMenuItem mnemonicParsing="flase" />
-                        <MenuItem mnemonicParsing="false" text="Settings" onAction="#openSettingsWindow"/>
+                        <MenuItem mnemonicParsing="false" onAction="#openSettingsWindow" text="Settings" />
                 </items>
               <items>
                   <CheckMenuItem mnemonicParsing="false" text="Verbose" />
@@ -84,12 +99,6 @@
                    <content>
                        <AnchorPane fx:id="imagePreviewAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <TreeTableView fx:id="browseMetadataTable" prefHeight="1051.0" prefWidth="1331.0">
-                                <columns>
-                                  <TreeTableColumn fx:id="browseMetadataTableKeyCol" editable="false" minWidth="0.0" prefWidth="550.0" text="Key" />
-                                  <TreeTableColumn fx:id="browseMetadataTableValueCol" prefWidth="304.0" text="Value" />
-                                </columns>
-                              </TreeTableView>
                               <StackPane prefHeight="1025.0" prefWidth="955.0">
                                  <children>
                                      <ImageView fx:id="imageViewer" fitHeight="1025.0" fitWidth="668.0" pickOnBounds="true" preserveRatio="true">
@@ -103,6 +112,20 @@
                                      <ProgressIndicator fx:id="loadingSpinner" visible="false" />
                                  </children>
                               </StackPane>
+                           </children>
+                       </AnchorPane>
+                   </content>
+                </Tab>
+                <Tab text="Preview">
+                  <content>
+                    <AnchorPane fx:id="imagePreviewAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TreeTableView fx:id="browseMetadataTable" prefHeight="1051.0" prefWidth="1331.0">
+                                <columns>
+                                  <TreeTableColumn fx:id="browseMetadataTableKeyCol" editable="false" minWidth="0.0" prefWidth="550.0" text="Key" />
+                                  <TreeTableColumn fx:id="browseMetadataTableValueCol" prefWidth="304.0" text="Value" />
+                                </columns>
+                              </TreeTableView>
                            </children>
                        </AnchorPane>
                    </content>
@@ -121,23 +144,6 @@
                         </AnchorPane>
                      </content>
                   </Tab>
-                <Tab text="Preview">
-                  <content>
-                    <AnchorPane fx:id="imagePreviewAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                               <TreeTableView fx:id="metadataTable" prefHeight="1051.0" prefWidth="1331.0">
-                                   <columns>
-                                       <TreeTableColumn fx:id="metadataTableKeyCol" editable="false" minWidth="0.0" prefWidth="550.0" text="Key" />
-                                       <TreeTableColumn fx:id="metadataTableValueCol" prefWidth="304.0" text="Value" />
-                                   </columns>
-                               </TreeTableView>
-                           </children>
-                       </AnchorPane>
-                   </content>
-                </Tab>
-                <Tab text="Edit">
-                    <StackPane />
-                </Tab>
               </tabs>
             </TabPane>
         </items>
