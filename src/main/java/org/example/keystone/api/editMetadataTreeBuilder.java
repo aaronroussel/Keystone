@@ -1,11 +1,10 @@
 package org.example.keystone.api;
 
 import com.sun.source.tree.Tree;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
+import javafx.util.Callback;
 import org.gdal.gdal.XMLNode;
 import org.gdal.gdal.gdal;
 
@@ -33,11 +32,14 @@ public class editMetadataTreeBuilder {
                 TreeItem<XMLTreeNode> metadataRootNode = getMetadataDomainNode(metadataDecoder);
 
 
+
+
                 if (spatialRefRootNode != null) {
                     TreeItem<XMLTreeNode> spatialrefNode = new TreeItem<>(new XMLTreeNode("Spatial Reference","",""));
                     spatialrefNode.getChildren().add(spatialRefRootNode);
                     rootNode.getChildren().add(spatialrefNode);
                 }
+
 
                 if (geoTransformRootNode != null) {
                     rootNode.getChildren().add(geoTransformRootNode);
@@ -62,10 +64,23 @@ public class editMetadataTreeBuilder {
                 // code to turn value column into text fields and make them editable
                 metadataTable.setEditable(true);
 
+
                 metadataTableValueCol.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
 
+
                 metadataTableValueCol.setOnEditCommit(event -> {
+
+
                     TreeItem <XMLTreeNode> currentEditingMetadata = metadataTable.getTreeItem(event.getTreeTablePosition().getRow());
+
+
+                    // do not edit for parent tree nodes
+                    boolean isChild = currentEditingMetadata.getChildren().toArray().length == 0;
+
+                    if (!isChild) {
+                        return;
+                    }
+
 
                     XMLTreeNode treeNode = currentEditingMetadata.getValue();
 
@@ -82,14 +97,14 @@ public class editMetadataTreeBuilder {
                         extension = filePath.substring(i+1);
                     }
 
-                    System.out.println(extension);
+
 
                     switch (extension) {
                         case "tif":
                             TiffDecoder tiffDecoder = new TiffDecoder(file, metadataDecoder.dataset);
 
                             tiffDecoder.setMetadataField(metadataKey, metadataValue);
-                            //tiffDecoder.setMetadataFromHashTable(metadataDecoder.getMetadataHashTable(domain););
+
                             break;
                         case "ntf":
                             NitfDecoder ntfDecoder = new NitfDecoder(file, metadataDecoder.dataset);

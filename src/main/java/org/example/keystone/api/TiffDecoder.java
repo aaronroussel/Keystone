@@ -38,7 +38,9 @@ public class TiffDecoder extends MetadataDecoder {
         /*
             Writes a single key-value pair to the file metadata under the default metadata domain
          */
+
         this.dataset.SetMetadataItem(key.toUpperCase(), value);
+        this.save();
     }
 
     public void setMetadataField(String key, String value, String domain) {

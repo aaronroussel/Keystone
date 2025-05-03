@@ -379,6 +379,16 @@ public abstract class MetadataDecoder {
         return new double[]{geoX, geoY};
     }
 
+    public void save() {
+        this.dataset.FlushCache();
+
+        this.dataset.delete();
+
+        this.getDataset();
+
+
+    }
+
 
         
 
