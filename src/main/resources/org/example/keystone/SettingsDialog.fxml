@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.keystone.api.SettingsController">
+    <content>
+        <GridPane hgap="10" vgap="10">
+            <Label text="Image Cache Size (MB):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="cacheSizeField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Max Image Size (MB):" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="subsampleSizeField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        </GridPane>
+    </content>
+    <buttonTypes>
+        <ButtonType text="Apply" buttonData="OK_DONE"/>
+        <ButtonType text="Cancel" buttonData="CANCEL_CLOSE"/>
+    </buttonTypes>
+</DialogPane>

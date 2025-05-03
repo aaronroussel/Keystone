@@ -5,7 +5,7 @@ import java.util.*;
 
 public class MemoryBoundImageCache {
     private final LinkedHashMap<File, javafx.scene.image.Image> cache;
-    private final long maxBytes;
+    private long maxBytes;
     private long currentBytes = 0;
 
     public MemoryBoundImageCache(long maxBytes) {
@@ -35,5 +35,13 @@ public class MemoryBoundImageCache {
     private long estimateImageSizeBytes(javafx.scene.image.Image image) {
         // image size estimation uses : width * height * 4 bytes per pixel
         return (long) image.getWidth() * (long) image.getHeight() * 4L;
+    }
+
+    public void setMaxBytes(long maxBytes) {
+        this.maxBytes = maxBytes;
+    }
+
+    public long getMaxBytes() {
+        return maxBytes;
     }
 }

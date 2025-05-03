@@ -28,7 +28,10 @@ import org.gdal.gdalconst.gdalconstConstants;
 
 public class ImageProcessor {
 
+   private static long maxSubsampledImageSizeInMB = 100L;
+
    public static Image getBufferedImage(File file) {
+
         Dataset dataset = gdal.Open(file.getAbsolutePath());
         if (dataset == null) {
             throw new RuntimeException("Failed to open file with GDAL: " + file.getAbsolutePath());
@@ -96,6 +99,7 @@ public class ImageProcessor {
    }
 
     public static Image getSubsampledBufferedImage(File file) {
+       System.out.println(maxSubsampledImageSizeInMB);
         int stepSize = getStepSize(file);
         Dataset dataset = gdal.Open(file.getAbsolutePath());
         if (dataset == null) {
@@ -105,6 +109,8 @@ public class ImageProcessor {
         int width = dataset.getRasterXSize();
         int height = dataset.getRasterYSize();
         int bands = dataset.getRasterCount();
+
+        System.out.println("Width = " + width + ", Height = " + height);
 
         if (bands < 1) {
             throw new RuntimeException("Image has no raster bands.");
@@ -217,18 +223,14 @@ public class ImageProcessor {
     }
 
 
-   public static boolean isLargeImage(File file) {
-       boolean isLarge = false;
-       long bytes = file.length();
-       int megabytes = (int)(bytes / (1024.0 * 1024.0));
-       if (megabytes > 1000) {
-           isLarge = true;
-       }
-       return isLarge;
-   }
+    public static boolean isLargeImage(File file) {
+        long bytes = file.length();
+        long threshold = maxSubsampledImageSizeInMB * 1024L * 1024L;
+        return bytes > threshold;
+    }
 
     public static int getStepSize(File file) {
-        long MAX_MEMORY_USAGE_BYTES = 200L * 1024 * 1024;
+        long MAX_MEMORY_USAGE_BYTES = maxSubsampledImageSizeInMB * 1024 * 1024;
         int BYTES_PER_PIXEL = 3;
 
         long fileSizeBytes = file.length();
@@ -240,6 +242,16 @@ public class ImageProcessor {
         double scaleFactor = Math.sqrt((double) totalPixels / maxPixelsAllowed);
         int stepSize = (int) Math.ceil(scaleFactor);
 
+        System.out.println(Math.max(stepSize, 1));
+
         return Math.max(stepSize, 1);
+    }
+
+    public static long getMaxSubsampledImageSizeInMB() {
+        return maxSubsampledImageSizeInMB;
+    }
+
+    public static void setMaxSubsampledImageSizeInMB(long maxSubsampledImageSizeInMB) {
+        ImageProcessor.maxSubsampledImageSizeInMB = maxSubsampledImageSizeInMB;
     }
 }

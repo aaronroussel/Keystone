@@ -5,8 +5,10 @@ import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.cell.TextFieldTreeCell;
@@ -17,8 +19,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import org.example.keystone.MainApplication;
 import org.gdal.gdal.XMLNode;
 import org.gdal.gdal.gdal;
 
@@ -26,11 +30,9 @@ import org.gdal.gdal.gdal;
 import java.awt.*;
 import java.beans.EventHandler;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.*;
 
 public class MainApplicationController implements Initializable {
 
@@ -227,5 +229,50 @@ public class MainApplicationController implements Initializable {
             }
         }
     }
+
+    public void openSettingsWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/keystone/SettingsDialog.fxml"));
+
+            DialogPane settingsPane = loader.load(); // NEW instance
+            SettingsController controller = loader.getController();
+
+
+            // ✅ Manually set current values BEFORE showing
+            controller.cacheSizeField.setText(String.valueOf(ImageFactory.getMaxCacheCapacityInMB()));
+            controller.subsampleSizeField.setText(String.valueOf(ImageProcessor.getMaxSubsampledImageSizeInMB()));
+
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("Settings");
+            dialog.setDialogPane(settingsPane);
+            dialog.initModality(Modality.APPLICATION_MODAL);
+
+
+            // Show the dialog and process result
+            Optional<ButtonType> result = dialog.showAndWait();
+            System.out.println("Dialog result: " + result);
+
+            if (result.isPresent() && result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                try {
+                    int cacheSize = Integer.parseInt(controller.cacheSizeField.getText());
+                    long subsampleSize = Long.parseLong(controller.subsampleSizeField.getText());
+
+                    ImageFactory.setMaxCacheCapacityInMB(cacheSize);
+                    ImageProcessor.setMaxSubsampledImageSizeInMB(subsampleSize);
+
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    // Optional: show error alert
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 
 }

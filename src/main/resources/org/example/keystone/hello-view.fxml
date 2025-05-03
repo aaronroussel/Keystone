@@ -34,6 +34,10 @@
           </Menu>
             <Menu mnemonicParsing="false" text="Tools" />
             <Menu mnemonicParsing="false" text="Options">
+                <items>
+                    <SeparatorMenuItem mnemonicParsing="flase" />
+                        <MenuItem mnemonicParsing="false" text="Settings" onAction="#openSettingsWindow"/>
+                </items>
               <items>
                   <CheckMenuItem mnemonicParsing="false" text="Verbose" />
                   <CheckMenuItem mnemonicParsing="false" text="Disable Warnings" />
