@@ -16,6 +16,7 @@ module org.example.keystone {
     requires jdk.compiler;
     requires jai.core;
     requires javafx.swing;
+    requires org.apache.commons.imaging;
 
     opens org.example.keystone to javafx.fxml;
     exports org.example.keystone;
