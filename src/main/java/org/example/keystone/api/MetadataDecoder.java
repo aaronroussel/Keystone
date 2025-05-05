@@ -35,6 +35,7 @@ public abstract class MetadataDecoder {
     protected Dataset dataset;
     protected File file;
 
+
     MetadataDecoder(File file, Dataset dataset) {
 
         if (!file.isFile()) {
@@ -92,6 +93,8 @@ public abstract class MetadataDecoder {
         return metadataList;
 
     }
+
+
 
     public void getDataset() {
         // used by the constructor to obtain a dataset from the input file object
@@ -391,7 +394,26 @@ public abstract class MetadataDecoder {
     
     public abstract void setSpatialReference(SpatialReference srs);
 
-    public abstract void setSpatialReferenceFromWKT(String wktString);
+    public void setSpatialReferenceFromWKT(String wktString, String newFilename) {
+        try {
+            // 1. Convert to GeoTIFF with a passed-in filename (no .tif check needed)
+            File geotiff = new File(this.file.getParent(), newFilename);
+
+
+
+            // 2. Reopen dataset for the new file
+            Dataset data =ImageProcessor.convertToGeoTiff(this.file, geotiff);
+
+            // 3. Set spatial reference
+            SpatialReference srs = new SpatialReference(wktString);
+            data.SetSpatialRef(srs);
+            data.FlushCache();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
     public abstract void setMetadataField(String key, String value);
 

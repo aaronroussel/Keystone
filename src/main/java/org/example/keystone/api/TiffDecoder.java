@@ -12,8 +12,8 @@ public class TiffDecoder extends MetadataDecoder {
     public TiffDecoder(File file, Dataset dataset) {
         super(file, dataset);
     }
-
-    public void setSpatialReferenceFromWKT(String wktString) {
+    @Override
+    public void setSpatialReferenceFromWKT(String wktString, String filename) {
         /*
             Takes a string in WKT format and creates a new spatial reference then writes it to the dataset. This can
             be used to write new geo-referencing data.
@@ -22,6 +22,7 @@ public class TiffDecoder extends MetadataDecoder {
         super.dataset.SetSpatialRef(spatialReference);
     }
 
+    @Override
     public void setSpatialReference(SpatialReference srs) {
         super.dataset.SetSpatialRef(srs);
     }

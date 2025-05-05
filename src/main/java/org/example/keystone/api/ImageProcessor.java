@@ -98,9 +98,17 @@ public class ImageProcessor {
         return SwingFXUtils.toFXImage(bufferedImage, null);
    }
 
+    public static Dataset convertToGeoTiff(File inputFile, File outputFile) throws Exception {
+        return gdal.GetDriverByName("GTiff").CreateCopy(outputFile.getAbsolutePath(),gdal.Open(inputFile.getAbsolutePath()));
+    }
+
+
+
+
     public static Image getSubsampledBufferedImage(File file) {
        System.out.println(maxSubsampledImageSizeInMB);
         int stepSize = getStepSize(file);
+        gdal.AllRegister();
         Dataset dataset = gdal.Open(file.getAbsolutePath());
         if (dataset == null) {
             throw new RuntimeException("Failed to open file with GDAL: " + file.getAbsolutePath());
