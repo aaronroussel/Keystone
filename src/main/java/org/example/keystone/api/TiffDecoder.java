@@ -9,11 +9,11 @@ import java.util.Hashtable;
 
 public class TiffDecoder extends MetadataDecoder {
 
-    public TiffDecoder(File file, Dataset dataset, ImageProcessor imageProcessor) {
-        super(file, dataset, imageProcessor);
+    public TiffDecoder(File file, Dataset dataset) {
+        super(file, dataset);
     }
     @Override
-    public void setSpatialReferenceFromWKT(String wktString) {
+    public void setSpatialReferenceFromWKT(String wktString, String filename) {
         /*
             Takes a string in WKT format and creates a new spatial reference then writes it to the dataset. This can
             be used to write new geo-referencing data.
@@ -40,6 +40,10 @@ public class TiffDecoder extends MetadataDecoder {
             Writes a single key-value pair to the file metadata under the default metadata domain
          */
         this.dataset.SetMetadataItem(key.toUpperCase(), value);
+        this.dataset.FlushCache();
+        this.dataset.delete();
+        this.dataset = null;
+        this.getDataset();
     }
 
     public void setMetadataField(String key, String value, String domain) {

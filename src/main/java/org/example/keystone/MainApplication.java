@@ -28,13 +28,12 @@ public class MainApplication extends Application {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
         // ------------ GDAl -----------------
-
-
-
+        gdal.AllRegister();
         // ----------- Init UI -----------
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("hello-view.fxml")); // load fxml file
         Scene scene = new Scene(fxmlLoader.load(), 1920, 1080); // create new scene with loaded fxml
         stage.setTitle("Keystone");
+        scene.getStylesheets().add(getClass().getResource("dark-theme.css").toExternalForm());
         stage.setScene(scene);
         stage.show(); // display scene
     }

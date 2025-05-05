@@ -34,16 +34,16 @@ public abstract class MetadataDecoder {
     //                              ----------------------WORK IN PROGRESS--------------------------
     protected Dataset dataset;
     protected File file;
-    private final ImageProcessor imageProcessor;
 
-    MetadataDecoder(File file, Dataset dataset, ImageProcessor imageProcessor) {
-        this.imageProcessor = imageProcessor;
+
+    MetadataDecoder(File file, Dataset dataset) {
+
         if (!file.isFile()) {
             throw new IllegalArgumentException("Cannot instantiate object: " + file.getName() + " is not a valid file");
         }
 
         this.file = file;
-        getDataset();
+        this.dataset = dataset;
     }
 
     public Vector<String> getMetadata() {
@@ -394,22 +394,25 @@ public abstract class MetadataDecoder {
     
     public abstract void setSpatialReference(SpatialReference srs);
 
-    public void setSpatialReferenceFromWKT(String wktString){
-
+    public void setSpatialReferenceFromWKT(String wktString, String newFilename) {
         try {
-            //1. convert to Geotiff
-            if (!this.file.getName().endsWith(".tif")) {
-                File geoTiff = new File(this.file.getParent(), "converted.tif");
-                this.file = imageProcessor.convertToGeoTiff(geoTiff);  // Now the method will be "used"
-            }
-            // 2. Directly set spatial reference
+            // 1. Convert to GeoTIFF with a passed-in filename (no .tif check needed)
+            File geotiff = new File(this.file.getParent(), newFilename);
+
+
+
+            // 2. Reopen dataset for the new file
+            Dataset data =ImageProcessor.convertToGeoTiff(this.file, geotiff);
+
+            // 3. Set spatial reference
             SpatialReference srs = new SpatialReference(wktString);
-            this.dataset.SetSpatialRef(srs);  // GDAL native call
-            this.dataset.FlushCache();        // Ensure changes persist
+            data.SetSpatialRef(srs);
+            data.FlushCache();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
 
 
     public abstract void setMetadataField(String key, String value);
@@ -425,6 +428,7 @@ public abstract class MetadataDecoder {
     }
 
     public void closeDataset() {
+        this.dataset.FlushCache();
         this.dataset.delete();
     }
 }

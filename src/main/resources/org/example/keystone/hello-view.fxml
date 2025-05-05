@@ -34,6 +34,10 @@
           </Menu>
             <Menu mnemonicParsing="false" text="Tools" />
             <Menu mnemonicParsing="false" text="Options">
+                <items>
+                    <SeparatorMenuItem mnemonicParsing="flase" />
+                        <MenuItem mnemonicParsing="false" text="Settings" onAction="#openSettingsWindow"/>
+                </items>
               <items>
                   <CheckMenuItem mnemonicParsing="false" text="Verbose" />
                   <CheckMenuItem mnemonicParsing="false" text="Disable Warnings" />
@@ -80,14 +84,19 @@
                    <content>
                        <AnchorPane fx:id="imagePreviewAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                               <ImageView fx:id="imageViewer" fitHeight="1025.0" fitWidth="668.0" pickOnBounds="true" preserveRatio="true">
-                                   <cursor>
-                                       <Cursor fx:constant="DEFAULT" />
-                                   </cursor>
-                                   <viewport>
-                                       <Rectangle2D />
-                                   </viewport>
-                               </ImageView>
+                              <StackPane prefHeight="1025.0" prefWidth="955.0">
+                                 <children>
+                                     <ImageView fx:id="imageViewer" fitHeight="1025.0" fitWidth="668.0" pickOnBounds="true" preserveRatio="true">
+                                         <cursor>
+                                             <Cursor fx:constant="DEFAULT" />
+                                         </cursor>
+                                         <viewport>
+                                             <Rectangle2D />
+                                         </viewport>
+                                     </ImageView>
+                                     <ProgressIndicator fx:id="loadingSpinner" visible="false" />
+                                 </children>
+                              </StackPane>
                            </children>
                        </AnchorPane>
                    </content>

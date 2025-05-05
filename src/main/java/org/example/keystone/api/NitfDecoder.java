@@ -8,8 +8,8 @@ import java.util.Hashtable;
 
 public class NitfDecoder extends MetadataDecoder {
 
-    NitfDecoder(File file, Dataset dataset, ImageProcessor imageprocessor) {
-        super(file, dataset, imageprocessor);
+    NitfDecoder(File file, Dataset dataset) {
+        super(file, dataset);
     }
 
     public void setSpatialReferenceFromWKT(String wktString) {
