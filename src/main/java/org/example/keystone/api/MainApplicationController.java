@@ -1,9 +1,6 @@
 package org.example.keystone.api;
 
-import com.sun.source.tree.Tree;
 import javafx.application.Platform;
-import javafx.beans.property.StringProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,31 +8,30 @@ import javafx.scene.control.*;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.cell.TextFieldTreeCell;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.example.keystone.MainApplication;
 import org.gdal.gdal.XMLNode;
 import org.gdal.gdal.gdal;
 
 
-import java.awt.*;
-import java.beans.EventHandler;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
-
+import java.util.Optional;
+import java.util.ResourceBundle;
 public class MainApplicationController implements Initializable {
-
     /*
                             This is the Main Application Controller
 
@@ -61,15 +57,26 @@ public class MainApplicationController implements Initializable {
     public ImageView imageViewer;
 
     @FXML
-    public TreeTableView<XMLTreeNode> metadataTable;
-    //public TreeTableView<MetadataEntry> metadataTable;
+    public TreeTableView<XMLTreeNode> browseMetadataTable;
+    //public TreeTableView<MetadataEntry> browseMetadataTable;
 
     @FXML
-    public TreeTableColumn<XMLTreeNode, String> metadataTableKeyCol;
-    //public TreeTableColumn<MetadataEntry, String> metadataTableKeyCol;
+    public TreeTableColumn<XMLTreeNode, String> browseMetadataTableKeyCol;
+    //public TreeTableColumn<MetadataEntry, String> browseMetadataTableKeyCol;
     @FXML
-    public TreeTableColumn<XMLTreeNode, String> metadataTableValueCol;
-    //public TreeTableColumn<MetadataEntry, String> metadataTableValueCol;
+    public TreeTableColumn<XMLTreeNode, String> browseMetadataTableValueCol;
+    //public TreeTableColumn<MetadataEntry, String> browseMetadataTableValueCol;
+
+    @FXML
+    public TreeTableView<XMLTreeNode> editMetadataTable;
+    //public TreeTableView<MetadataEntry> editMetadataTable;
+
+    @FXML
+    public TreeTableColumn<XMLTreeNode, String> editMetadataTableKeyCol;
+    //public TreeTableColumn<MetadataEntry, String> editMetadataTableKeyCol;
+    @FXML
+    public TreeTableColumn<XMLTreeNode, String> editMetadataTableValueCol;
+    //public TreeTableColumn<MetadataEntry, String> editMetadataTableValueCol;
 
     @FXML
     public AnchorPane imagePreviewAnchorPane;
@@ -94,11 +101,20 @@ public class MainApplicationController implements Initializable {
         imageViewer.fitWidthProperty().bind(imagePreviewAnchorPane.widthProperty());
 
 
-        metadataTable.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty());
+        browseMetadataTable.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty());
 
-        metadataTableKeyCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
-        metadataTableValueCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
+        browseMetadataTableKeyCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
+        browseMetadataTableValueCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
+
+
+        editMetadataTable.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty());
+
+        editMetadataTableKeyCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
+        editMetadataTableValueCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
+
+        editMetadataTableValueCol.setEditable(true);
     }
+
 
 
     private void populateFileDirectoryTreeView(File directory) {
@@ -125,16 +141,18 @@ public class MainApplicationController implements Initializable {
                 File cellFile = cell.getItem();
 
 
-
                 if (cellFile != null && !cellFile.isDirectory()) {
                     String filePath = cellFile.getAbsolutePath();
+
                     imageViewer.setImage(null);
+
                     Platform.runLater(() -> loadingSpinner.setVisible(true));  // Show spinner
                     ImageFetcher imageFetcher = new ImageFetcher(imageViewer, cellFile, () -> {
                         Platform.runLater(() -> loadingSpinner.setVisible(false)); // Hide spinner
                     });
                     new Thread(imageFetcher).start();
-                    MetadataTreeBuilder.buildTree(filePath, metadataTable, metadataTableKeyCol, metadataTableValueCol);
+                    browseMetadataTreeBuilder.buildTree(filePath, browseMetadataTable, browseMetadataTableKeyCol, browseMetadataTableValueCol);
+                    editMetadataTreeBuilder.buildTree(filePath, editMetadataTable, editMetadataTableKeyCol, editMetadataTableValueCol, browseMetadataTable, browseMetadataTableKeyCol, browseMetadataTableValueCol);
                 }
             });
 
@@ -191,8 +209,11 @@ public class MainApplicationController implements Initializable {
 
         TreeItem<XMLTreeNode> topNode = new TreeItem<>(new XMLTreeNode("Metadata", "", ""));
 
-        metadataTable.setRoot(topNode);
-        metadataTable.setShowRoot(false);
+        browseMetadataTable.setRoot(topNode);
+        browseMetadataTable.setShowRoot(false);
+
+        editMetadataTable.setRoot(topNode);
+        editMetadataTable.setShowRoot(false);
 
     }
 

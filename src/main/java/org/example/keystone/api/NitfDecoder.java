@@ -18,13 +18,31 @@ public class NitfDecoder extends MetadataDecoder {
     }
 
     public void setMetadataField(String key, String value) {
-        String newKey = "NITF_" + key.toUpperCase();
+        String newKey = key.toUpperCase();
+
+        if (!key.startsWith("NITF_")) {
+            newKey = "NITF_" + newKey;
+        }
+
         this.dataset.SetMetadataItem(newKey, value.toUpperCase());
+        this.dataset.FlushCache();
+        this.dataset.delete();
+        this.dataset = null;
+        this.getDataset();
     }
 
     public void setMetadataField(String key, String value, String domain) {
-        String newKey = "NITF_" + key.toUpperCase();
+        String newKey = key.toUpperCase();
+
+        if (!key.startsWith("NITF_")) {
+            newKey = "NITF_" + newKey;
+        }
+
         this.dataset.SetMetadataItem(newKey, value.toUpperCase(), domain);
+        this.dataset.FlushCache();
+        this.dataset.delete();
+        this.dataset = null;
+        this.getDataset();
     }
 
     public void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable) {

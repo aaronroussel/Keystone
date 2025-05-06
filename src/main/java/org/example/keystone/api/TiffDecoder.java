@@ -39,6 +39,7 @@ public class TiffDecoder extends MetadataDecoder {
         /*
             Writes a single key-value pair to the file metadata under the default metadata domain
          */
+
         this.dataset.SetMetadataItem(key.toUpperCase(), value);
         this.dataset.FlushCache();
         this.dataset.delete();
@@ -51,6 +52,10 @@ public class TiffDecoder extends MetadataDecoder {
             Writes a single key-value pair to the specified metadata domain
          */
         this.dataset.SetMetadataItem(key.toUpperCase(), value, domain);
+        this.dataset.FlushCache();
+        this.dataset.delete();
+        this.dataset = null;
+        this.getDataset();
     }
 
     public void setMetadataFromHashTable(Hashtable<String, String> metadataHashTable, String domain) {
