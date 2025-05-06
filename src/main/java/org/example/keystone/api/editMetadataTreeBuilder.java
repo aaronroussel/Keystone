@@ -24,8 +24,7 @@ public class editMetadataTreeBuilder {
                 editMetadataTreeBuilder.isEditing = false;
 
                 File file = new File(filePath);
-                ImageProcessor imageprocessor = new ImageProcessor();
-                MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file, imageprocessor);
+                MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
 
                 if (metadataDecoder == null) {
                     throw new IllegalArgumentException("Unsupported file format, or unable to create decoder");
@@ -107,7 +106,7 @@ public class editMetadataTreeBuilder {
 
                     System.out.println("Saved!");
 
-                    MetadataDecoder decoder = MetadataDecoderFactory.createDecoder(file, imageprocessor);
+                    MetadataDecoder decoder = MetadataDecoderFactory.createDecoder(file);
 
                     assert decoder != null;
                     if (currentEditingDomain.equalsIgnoreCase("DEFAULT")) {
@@ -151,7 +150,7 @@ public class editMetadataTreeBuilder {
 
                     System.out.println("Saved!");
 
-                    MetadataDecoder decoder = MetadataDecoderFactory.createDecoder(file, imageprocessor);
+                    MetadataDecoder decoder = MetadataDecoderFactory.createDecoder(file);
 
                     assert decoder != null;
                     if (currentEditingDomain.equalsIgnoreCase("DEFAULT")) {
