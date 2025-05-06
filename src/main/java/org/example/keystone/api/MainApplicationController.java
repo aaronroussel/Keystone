@@ -84,6 +84,16 @@ public class MainApplicationController implements Initializable {
     @FXML
     private ProgressIndicator loadingSpinner;
 
+    @FXML private ComboBox<String> formatComboBox;
+
+    @FXML private TextField inputTextField;
+
+    @FXML private Button acceptButton;
+
+    private File currentFile;
+
+    private File currentDirectory;
+
 
 
 
@@ -143,8 +153,11 @@ public class MainApplicationController implements Initializable {
 
                 if (cellFile != null && !cellFile.isDirectory()) {
                     String filePath = cellFile.getAbsolutePath();
+                    currentFile = new File(filePath);
 
                     imageViewer.setImage(null);
+                    browseMetadataTable.setRoot(null);
+                    editMetadataTable.setRoot(null);
 
                     Platform.runLater(() -> loadingSpinner.setVisible(true));  // Show spinner
                     ImageFetcher imageFetcher = new ImageFetcher(imageViewer, cellFile, () -> {
@@ -289,6 +302,45 @@ public class MainApplicationController implements Initializable {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleAcceptAction() {
+        String selectedFormat = formatComboBox.getValue();
+        String inputText = inputTextField.getText();
+
+        if (selectedFormat.equals("EPSG Code")) {
+            try {
+                String newFileName = getFileNameWithoutExtension(currentFile.getAbsolutePath()) + ".tif";
+                MetadataDecoder mdd = MetadataDecoderFactory.createDecoder(currentFile.getAbsoluteFile());
+                mdd.setSpatialReferenceFromEPSG(inputText, newFileName);
+                inputTextField.setText("");
+                loadDirectory();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else if (selectedFormat.equals("WKT")) {
+            try {
+                String newFileName = getFileNameWithoutExtension(currentFile.getAbsolutePath()) + ".tif";
+                MetadataDecoder mdd = MetadataDecoderFactory.createDecoder(currentFile.getAbsoluteFile());
+                mdd.setSpatialReferenceFromWKT(inputText, newFileName);
+                inputTextField.setText("");
+                loadDirectory();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static String getFileNameWithoutExtension(String filePath) {
+        File file = new File(filePath);
+        String fileName = file.getName();
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex > 0) {
+            return fileName.substring(0, dotIndex);
+        } else {
+            return fileName;
         }
     }
 

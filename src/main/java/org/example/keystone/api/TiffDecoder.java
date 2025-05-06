@@ -20,6 +20,19 @@ public class TiffDecoder extends MetadataDecoder {
          */
         SpatialReference spatialReference = new SpatialReference(wktString);
         super.dataset.SetSpatialRef(spatialReference);
+        super.dataset.FlushCache();
+    }
+
+    @Override
+    public void setSpatialReferenceFromEPSG(String EPSG, String filename) {
+        try {
+            int code = Integer.parseInt(EPSG);
+            SpatialReference srs = newSpatialReferenceFromEPSG(code);
+            super.dataset.SetSpatialRef(srs);
+            super.dataset.FlushCache();
+        } catch (NumberFormatException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

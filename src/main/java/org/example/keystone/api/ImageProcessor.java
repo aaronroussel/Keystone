@@ -108,7 +108,6 @@ public class ImageProcessor {
     public static Image getSubsampledBufferedImage(File file) {
        System.out.println(maxSubsampledImageSizeInMB);
         int stepSize = getStepSize(file);
-        gdal.AllRegister();
         Dataset dataset = gdal.Open(file.getAbsolutePath());
         if (dataset == null) {
             throw new RuntimeException("Failed to open file with GDAL: " + file.getAbsolutePath());
