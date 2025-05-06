@@ -22,14 +22,13 @@ public class JpegDecoder extends MetadataDecoder {
     public void setSpatialReference(SpatialReference srs) {
         try {
             double[] latLon = getCenterLatLon();
-            writeGPSWithExifTool(latLon[0], latLon[1]);
-            writeXmpWithExifTool("WKT_SRS", srs.ExportToPrettyWkt());
+            ExifToolWrapper.writeGPSMetadata(file, latLon[0], latLon[1]);
+            ExifToolWrapper.writeXmpMetadata(file, "WKT_SRS", srs.ExportToPrettyWkt());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    @Override
     public void setSpatialReferenceFromWKT(String wktString) {
         writeXmpWithExifTool("WKT_SRS", wktString);
     }
@@ -57,22 +56,11 @@ public class JpegDecoder extends MetadataDecoder {
     }
 
     private void setXmpField(String key, String value) {
-        writeXmpWithExifTool(key, value);
-    }
-
-    private void writeGPSWithExifTool(double lat, double lon) throws IOException {
-        String latRef = lat >= 0 ? "N" : "S";
-        String lonRef = lon >= 0 ? "E" : "W";
-        ProcessBuilder pb = new ProcessBuilder(
-                "exiftool",
-                "-overwrite_original",
-                "-GPSLatitude=" + Math.abs(lat),
-                "-GPSLatitudeRef=" + latRef,
-                "-GPSLongitude=" + Math.abs(lon),
-                "-GPSLongitudeRef=" + lonRef,
-                file.getAbsolutePath()
-        );
-        pb.inheritIO().start();
+        try {
+            ExifToolWrapper.writeXmpMetadata(file, key, value);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void writeXmpWithExifTool(String key, String value) {

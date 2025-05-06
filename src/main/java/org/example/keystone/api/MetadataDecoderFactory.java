@@ -46,7 +46,7 @@ public class MetadataDecoderFactory {
             case "tif", "tiff" -> new TiffDecoder(file, getDataset(file, true));
             case "ntf" -> new NitfDecoder(file, getDataset(file, true));
             case "jpg" -> new JpegDecoder(file, getDataset(file, false));
-            case "png" -> null;
+            case "png" -> new PNGDecoder(file, getDataset(file, false));
             default -> throw new UnsupportedOperationException("Unsupported File Type: " + fileType);
         };
     }

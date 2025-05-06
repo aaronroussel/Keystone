@@ -23,7 +23,7 @@ public class PNGDecoder extends MetadataDecoder {
         setMetadataField("WKT_SRS", srs.ExportToPrettyWkt());
     }
 
-    @Override
+
     public void setSpatialReferenceFromWKT(String wktString) {
         setMetadataField("WKT_SRS", wktString);
     }
@@ -31,14 +31,7 @@ public class PNGDecoder extends MetadataDecoder {
     @Override
     public void setMetadataField(String key, String value) {
         try {
-            // Write XMP using ExifTool as a structured iTXt chunk
-            ProcessBuilder pb = new ProcessBuilder(
-                    "exiftool",
-                    "-overwrite_original",
-                    "-XMP-dc:" + key + "=" + value,
-                    file.getAbsolutePath()
-            );
-            pb.inheritIO().start();
+            ExifToolWrapper.writeXmpMetadata(file, key, value);
         } catch (IOException e) {
             e.printStackTrace();
         }
