@@ -7,7 +7,10 @@ import javafx.stage.Stage;
 
 import org.example.keystone.api.MetadataDecoder;
 import org.example.keystone.api.MetadataDecoderFactory;
+import org.gdal.gdal.Dataset;
+import org.gdal.gdal.Driver;
 import org.gdal.gdal.gdal;
+import org.gdal.gdalconst.gdalconst;
 import org.gdal.ogr.ogr;
 import org.gdal.osr.SpatialReference;
 import org.pf4j.DefaultPluginManager;

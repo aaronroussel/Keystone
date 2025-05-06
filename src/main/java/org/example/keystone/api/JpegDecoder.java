@@ -17,10 +17,8 @@ public class JpegDecoder extends MetadataDecoder {
 
     }
 
-    @Override
-    public void setSpatialReferenceFromWKT(String wktString) {
 
-    }
+
 
     @Override
     public void setMetadataField(String key, String value) {
