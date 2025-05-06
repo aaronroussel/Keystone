@@ -157,7 +157,7 @@ public class MainApplicationController implements Initializable {
                     });
                     new Thread(imageFetcher).start();
                     browseMetadataTreeBuilder.buildTree(filePath, browseMetadataTable, browseMetadataTableKeyCol, browseMetadataTableValueCol);
-                    editMetadataTreeBuilder.buildTree(filePath, editMetadataTable, editMetadataTableKeyCol, editMetadataTableValueCol);
+                    editMetadataTreeBuilder.buildTree(filePath, editMetadataTable, editMetadataTableKeyCol, editMetadataTableValueCol, browseMetadataTable, browseMetadataTableKeyCol, browseMetadataTableValueCol);
                 }
             });
 

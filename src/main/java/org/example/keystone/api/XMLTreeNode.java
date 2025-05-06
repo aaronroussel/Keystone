@@ -26,5 +26,9 @@ public class XMLTreeNode {
         return nodePath;
     }
 
+    public void setNodeName(String nodeName) {
+        this.nodeName.set(nodeName);
+    }
+
     public void setNodeValue(String value) {this.nodeValue.set(value);}
 }
