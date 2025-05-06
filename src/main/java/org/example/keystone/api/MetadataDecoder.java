@@ -412,14 +412,29 @@ public abstract class MetadataDecoder {
 
 
             // 2. Reopen dataset for the new file
-            Dataset data =ImageProcessor.convertToGeoTiff(this.file, geotiff);
+            Dataset data = ImageProcessor.convertToGeoTiff(this.file, geotiff);
 
             // 3. Set spatial reference
             SpatialReference srs = new SpatialReference(wktString);
             data.SetSpatialRef(srs);
             data.FlushCache();
+            data.delete();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void setSpatialReferenceFromEPSG(String EPSG, String newFilename) throws Exception {
+        try {
+            int code = Integer.parseInt(EPSG);
+            File geotiff = new File(this.file.getParent(), newFilename);
+            Dataset data = ImageProcessor.convertToGeoTiff(this.file, geotiff);
+            SpatialReference srs = newSpatialReferenceFromEPSG(code);
+            data.SetSpatialRef(srs);
+            data.FlushCache();
+            data.delete();
+        } catch (Exception e) {
+            throw new Exception(e);
         }
     }
 

@@ -1,27 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.geometry.Rectangle2D?>
-<?import javafx.scene.Cursor?>
-<?import javafx.scene.control.CheckMenuItem?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.SplitMenuButton?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TreeTableColumn?>
-<?import javafx.scene.control.TreeTableView?>
-<?import javafx.scene.control.TreeView?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 
-<VBox alignment="TOP_CENTER" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.keystone.api.MainApplicationController">
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<VBox alignment="TOP_CENTER" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.keystone.api.MainApplicationController">
    <children>
       <MenuBar prefHeight="0.0" prefWidth="1959.0" VBox.vgrow="ALWAYS">
         <menus>
@@ -116,7 +103,7 @@
                        </AnchorPane>
                    </content>
                 </Tab>
-                <Tab text="Preview">
+                <Tab text="Metadata">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -144,6 +131,35 @@
                         </AnchorPane>
                      </content>
                   </Tab>
+                  <Tab text="Spatial Reference">
+                      <content>
+                          <VBox spacing="10">
+                              <padding>
+                                  <Insets top="10" bottom="10" right="20" left="20" />
+                              </padding>
+                              <StackPane>
+                                  <ComboBox fx:id="formatComboBox" prefWidth="200">
+                                      <items>
+                                          <FXCollections fx:factory="observableArrayList">
+                                              <String fx:value="EPSG Code" />
+                                              <String fx:value="WKT" />
+                                          </FXCollections>
+                                      </items>
+                                      <value>
+                                          <String fx:value="EPSG Code" />
+                                      </value>
+                                  </ComboBox>
+                              </StackPane>
+                              <StackPane>
+                                  <TextField fx:id="inputTextField" prefWidth="400" promptText="Enter spatial reference here" />
+                              </StackPane>
+                              <StackPane>
+                                  <Button fx:id="acceptButton" text="Accept" onAction="#handleAcceptAction" />
+                              </StackPane>
+                          </VBox>
+                      </content>
+                  </Tab>
+
               </tabs>
             </TabPane>
         </items>
