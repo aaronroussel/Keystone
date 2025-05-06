@@ -24,7 +24,8 @@ public class editMetadataTreeBuilder {
                 editMetadataTreeBuilder.isEditing = false;
 
                 File file = new File(filePath);
-                MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
+                ImageProcessor imageprocessor = new ImageProcessor();
+                MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file, imageprocessor);
 
                 if (metadataDecoder == null) {
                     throw new IllegalArgumentException("Unsupported file format, or unable to create decoder");
@@ -106,37 +107,16 @@ public class editMetadataTreeBuilder {
 
                     System.out.println("Saved!");
 
-                    String extension = "";
+                    MetadataDecoder decoder = MetadataDecoderFactory.createDecoder(file, imageprocessor);
 
-                    int i = filePath.lastIndexOf('.');
-                    if (i > 0) {
-                        extension = filePath.substring(i+1);
+                    assert decoder != null;
+                    if (currentEditingDomain.equalsIgnoreCase("DEFAULT")) {
+                        decoder.setMetadataField(metadataKey, metadataValue);
+                    }
+                    else {
+                        decoder.setMetadataField(metadataKey, metadataValue, currentEditingDomain);
                     }
 
-                    switch (extension) {
-                        case "tif":
-                            TiffDecoder tiffDecoder = new TiffDecoder(file, metadataDecoder.dataset);
-
-                            if (currentEditingDomain.equalsIgnoreCase("DEFAULT")) {
-                                tiffDecoder.setMetadataField(metadataKey, metadataValue);
-                            }
-                            else {
-                                tiffDecoder.setMetadataField(metadataKey, metadataValue, currentEditingDomain);
-                            }
-
-                            break;
-                        case "ntf":
-                            NitfDecoder ntfDecoder = new NitfDecoder(file, metadataDecoder.dataset);
-
-                            if (currentEditingDomain.equalsIgnoreCase("DEFAULT")) {
-                                ntfDecoder.setMetadataField(metadataKey, metadataValue);
-                            }
-                            else {
-                                ntfDecoder.setMetadataField(metadataKey, metadataValue, currentEditingDomain);
-                            }
-
-                            break;
-                    }
 
                     editMetadataTreeBuilder.isEditing = false;
                     browseMetadataTreeBuilder.buildTree(filePath, browseMetadataTable, browseMetadataTableKeyCol, browseMetadataTableValueCol);
@@ -169,37 +149,16 @@ public class editMetadataTreeBuilder {
                     String metadataKey = treeNode.nodeNameProperty().get();
                     String metadataValue = treeNode.nodeValueProperty().get();
 
-                    System.out.println("saved!");
+                    System.out.println("Saved!");
 
-                    String extension = "";
+                    MetadataDecoder decoder = MetadataDecoderFactory.createDecoder(file, imageprocessor);
 
-                    int i = filePath.lastIndexOf('.');
-                    if (i > 0) {
-                        extension = filePath.substring(i+1);
+                    assert decoder != null;
+                    if (currentEditingDomain.equalsIgnoreCase("DEFAULT")) {
+                        decoder.setMetadataField(metadataKey, metadataValue);
                     }
-
-                    switch (extension) {
-                        case "tif":
-                            TiffDecoder tiffDecoder = new TiffDecoder(file, metadataDecoder.dataset);
-
-                            if (currentEditingDomain.equalsIgnoreCase("DEFAULT")) {
-                                tiffDecoder.setMetadataField(metadataKey, metadataValue);
-                            }
-                            else {
-                                tiffDecoder.setMetadataField(metadataKey, metadataValue, currentEditingDomain);
-                            }
-
-                            break;
-                        case "ntf":
-                            NitfDecoder ntfDecoder = new NitfDecoder(file, metadataDecoder.dataset);
-
-                            if (currentEditingDomain.equalsIgnoreCase("DEFAULT")) {
-                                ntfDecoder.setMetadataField(metadataKey, metadataValue);
-                            }
-                            else {
-                                ntfDecoder.setMetadataField(metadataKey, metadataValue, currentEditingDomain);
-                            }
-                            break;
+                    else {
+                        decoder.setMetadataField(metadataKey, metadataValue, currentEditingDomain);
                     }
 
                     editMetadataTreeBuilder.isEditing = false;

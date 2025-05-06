@@ -112,14 +112,7 @@ public class MainApplicationController implements Initializable {
         editMetadataTableKeyCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
         editMetadataTableValueCol.prefWidthProperty().bind(imagePreviewAnchorPane.widthProperty().divide(2));
 
-
-
         editMetadataTableValueCol.setEditable(true);
-
-
-
-
-
     }
 
 
@@ -150,7 +143,9 @@ public class MainApplicationController implements Initializable {
 
                 if (cellFile != null && !cellFile.isDirectory()) {
                     String filePath = cellFile.getAbsolutePath();
+
                     imageViewer.setImage(null);
+
                     Platform.runLater(() -> loadingSpinner.setVisible(true));  // Show spinner
                     ImageFetcher imageFetcher = new ImageFetcher(imageViewer, cellFile, () -> {
                         Platform.runLater(() -> loadingSpinner.setVisible(false)); // Hide spinner
