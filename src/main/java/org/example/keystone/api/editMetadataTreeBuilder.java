@@ -1,10 +1,12 @@
 package org.example.keystone.api;
 
-import com.sun.source.tree.Tree;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
-import javafx.util.Callback;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 import org.gdal.gdal.XMLNode;
 import org.gdal.gdal.gdal;
 
@@ -14,10 +16,16 @@ import java.util.Vector;
 
 public class editMetadataTreeBuilder {
 
-    public static void buildTree(String filePath, TreeTableView<XMLTreeNode> metadataTable, TreeTableColumn<XMLTreeNode, String> metadataTableKeyCol, TreeTableColumn<XMLTreeNode, String> metadataTableValueCol) {
+    public static boolean isEditing = false;
+    public static XMLTreeNode lastAdded = null;
+
+    public static void buildTree(String filePath, TreeTableView<XMLTreeNode> editMetadataTable, TreeTableColumn<XMLTreeNode, String> editMetadataTableKeyCol, TreeTableColumn<XMLTreeNode, String> editMetadataTableValueCol, TreeTableView<XMLTreeNode> browseMetadataTable, TreeTableColumn<XMLTreeNode, String> browseMetadataTableKeyCol, TreeTableColumn<XMLTreeNode, String> browseMetadataTableValueCol) {
             try {
+                editMetadataTreeBuilder.isEditing = false;
+
                 File file = new File(filePath);
-                MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
+                ImageProcessor imageprocessor = new ImageProcessor();
+                MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file, imageprocessor);
 
                 if (metadataDecoder == null) {
                     throw new IllegalArgumentException("Unsupported file format, or unable to create decoder");
@@ -30,8 +38,6 @@ public class editMetadataTreeBuilder {
                 TreeItem<XMLTreeNode> geoTransformRootNode = getGeoTransformNode(metadataDecoder);
                 TreeItem<XMLTreeNode> cornerCoordinatesRootNode = getCornerCoordinatesNode(metadataDecoder);
                 TreeItem<XMLTreeNode> metadataRootNode = getMetadataDomainNode(metadataDecoder);
-
-
 
 
                 if (spatialRefRootNode != null) {
@@ -54,27 +60,79 @@ public class editMetadataTreeBuilder {
                 }
 
                 topNode.getChildren().add(rootNode);
-                metadataTable.setRoot(topNode);
-                metadataTable.setShowRoot(false);
+                editMetadataTable.setRoot(topNode);
+                editMetadataTable.setShowRoot(false);
 
-                metadataTableKeyCol.setCellValueFactory(param -> param.getValue().getValue().nodeNameProperty());
-                metadataTableValueCol.setCellValueFactory(param -> param.getValue().getValue().nodeValueProperty());
+                editMetadataTableKeyCol.setCellValueFactory(param -> param.getValue().getValue().nodeNameProperty());
+                editMetadataTableValueCol.setCellValueFactory(param -> param.getValue().getValue().nodeValueProperty());
+
+
+                // create input handler for creating new domains
+                EventHandler<MouseEvent> mouseEventHandle = (MouseEvent event) -> {
+                    handleMouseClicked(event, editMetadataTable);
+                };
+
+                editMetadataTable.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEventHandle);
 
 
                 // code to turn value column into text fields and make them editable
-                metadataTable.setEditable(true);
+                editMetadataTable.setEditable(true);
+
+                editMetadataTableKeyCol.setEditable(true);
+                editMetadataTableValueCol.setEditable(true);
+
+                editMetadataTableKeyCol.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+
+                // code to actually edit key tree items when user changes them and edit metadata on edit with a value present
+                editMetadataTableKeyCol.setOnEditCommit(event -> {
+                    TreeItem <XMLTreeNode> currentEditingMetadata = editMetadataTable.getTreeItem(event.getTreeTablePosition().getRow());
+
+                    XMLTreeNode treeNode = currentEditingMetadata.getValue();
+
+                    if (!treeNode.nodeNameProperty().get().isEmpty() && !treeNode.nodeValueProperty().get().isEmpty()) {
+                        return;
+                    }
+
+                    treeNode.setNodeName(event.getNewValue());
+
+                    // get new metadata to write
+                    String currentEditingDomain = currentEditingMetadata.getParent().getValue().nodeNameProperty().getValue();
+                    String metadataKey = treeNode.nodeNameProperty().get();
+                    String metadataValue = treeNode.nodeValueProperty().get();
+
+                    if (metadataKey.isEmpty() || metadataValue.isEmpty()) {
+                        return;
+
+                    }
+
+                    System.out.println("Saved!");
+
+                    MetadataDecoder decoder = MetadataDecoderFactory.createDecoder(file, imageprocessor);
+
+                    assert decoder != null;
+                    if (currentEditingDomain.equalsIgnoreCase("DEFAULT")) {
+                        decoder.setMetadataField(metadataKey, metadataValue);
+                    }
+                    else {
+                        decoder.setMetadataField(metadataKey, metadataValue, currentEditingDomain);
+                    }
 
 
-                metadataTableValueCol.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+                    editMetadataTreeBuilder.isEditing = false;
+                    browseMetadataTreeBuilder.buildTree(filePath, browseMetadataTable, browseMetadataTableKeyCol, browseMetadataTableValueCol);
+
+                });
+
+                editMetadataTableValueCol.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+
+                // code to actually edit value tree items when user changes them and edit metadata on edit with a value present
+                editMetadataTableValueCol.setOnEditCommit(event -> {
 
 
-                metadataTableValueCol.setOnEditCommit(event -> {
+                    TreeItem <XMLTreeNode> currentEditingMetadata = editMetadataTable.getTreeItem(event.getTreeTablePosition().getRow());
 
 
-                    TreeItem <XMLTreeNode> currentEditingMetadata = metadataTable.getTreeItem(event.getTreeTablePosition().getRow());
-
-
-                    // do not edit for parent tree nodes
+                    // do not edit values for parent tree nodes
                     boolean isChild = currentEditingMetadata.getChildren().toArray().length == 0;
 
                     if (!isChild) {
@@ -86,49 +144,60 @@ public class editMetadataTreeBuilder {
 
                     treeNode.setNodeValue(event.getNewValue());
 
+                    // get new metadata to write
+                    String currentEditingDomain = currentEditingMetadata.getParent().getValue().nodeNameProperty().getValue();
                     String metadataKey = treeNode.nodeNameProperty().get();
                     String metadataValue = treeNode.nodeValueProperty().get();
 
+                    System.out.println("Saved!");
 
-                    String extension = "";
+                    MetadataDecoder decoder = MetadataDecoderFactory.createDecoder(file, imageprocessor);
 
-                    int i = filePath.lastIndexOf('.');
-                    if (i > 0) {
-                        extension = filePath.substring(i+1);
+                    assert decoder != null;
+                    if (currentEditingDomain.equalsIgnoreCase("DEFAULT")) {
+                        decoder.setMetadataField(metadataKey, metadataValue);
+                    }
+                    else {
+                        decoder.setMetadataField(metadataKey, metadataValue, currentEditingDomain);
                     }
 
-
-
-                    switch (extension) {
-                        case "tif":
-                            TiffDecoder tiffDecoder = new TiffDecoder(file, metadataDecoder.dataset);
-
-                            tiffDecoder.setMetadataField(metadataKey, metadataValue);
-
-                            break;
-                        case "ntf":
-                            NitfDecoder ntfDecoder = new NitfDecoder(file, metadataDecoder.dataset);
-
-                            ntfDecoder.setMetadataField(metadataKey, metadataValue);
-                            break;
-                        case "jpeg":
-                            JpegDecoder jpegDecoder = new JpegDecoder(file, metadataDecoder.dataset);
-
-                            jpegDecoder.setMetadataField(metadataKey, metadataValue);
-                            break;
-                    }
-
-
+                    editMetadataTreeBuilder.isEditing = false;
+                    browseMetadataTreeBuilder.buildTree(filePath, browseMetadataTable, browseMetadataTableKeyCol, browseMetadataTableValueCol);
                 });
-
-
-
-
 
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
+    }
+
+    private static void handleMouseClicked(MouseEvent event, TreeTableView<XMLTreeNode> metadataTable) {
+
+        Node node = event.getPickResult().getIntersectedNode();
+        // Accept clicks only on node cells, and not on empty spaces of the TreeView
+        if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)) {
+            TreeItem<XMLTreeNode> clickedItem = metadataTable.getSelectionModel().getSelectedItem();
+
+            // make sure input is a right click
+            // make sure we aren't awaiting an edit
+            // allow creation of metadata domain nodes
+            // force population of newly created parent domain nodes
+
+            if (event.getButton() != MouseButton.SECONDARY |
+                    (editMetadataTreeBuilder.isEditing &
+                            (((clickedItem.getValue().nodeNameProperty().getValue().isEmpty() & !clickedItem.getValue().nodeValueProperty().getValue().isEmpty())) | (editMetadataTreeBuilder.lastAdded != null & !clickedItem.getValue().equals(editMetadataTreeBuilder.lastAdded))))
+                    ) {
+                return;
+            }
+
+            XMLTreeNode addedXMLTreeNode = new XMLTreeNode("", "", "");
+
+            editMetadataTreeBuilder.lastAdded = addedXMLTreeNode;
+
+            clickedItem.getChildren().add(new TreeItem<>(addedXMLTreeNode));
+            editMetadataTreeBuilder.isEditing = true;
+
+        }
     }
 
     private static TreeItem<XMLTreeNode> getSpatialReferenceNode(MetadataDecoder metadataDecoder) {

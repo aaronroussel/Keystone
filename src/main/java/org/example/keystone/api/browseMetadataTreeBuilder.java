@@ -15,7 +15,8 @@ public class browseMetadataTreeBuilder {
     public static void buildTree(String filePath, TreeTableView<XMLTreeNode> metadataTable, TreeTableColumn<XMLTreeNode, String> metadataTableKeyCol, TreeTableColumn<XMLTreeNode, String> metadataTableValueCol) {
             try {
                 File file = new File(filePath);
-                MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file);
+                ImageProcessor imageprocessor = new ImageProcessor();
+                MetadataDecoder metadataDecoder = MetadataDecoderFactory.createDecoder(file, imageprocessor);
 
                 if (metadataDecoder == null) {
                     throw new IllegalArgumentException("Unsupported file format, or unable to create decoder");
