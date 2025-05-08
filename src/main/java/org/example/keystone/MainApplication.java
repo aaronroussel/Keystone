@@ -24,9 +24,6 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         // ----------- Init Plugins ----------
-        PluginManager pluginManager = new DefaultPluginManager();
-        pluginManager.loadPlugins();
-        pluginManager.startPlugins();
         // ------------ GDAl -----------------
         gdal.AllRegister();
         // ----------- Init UI -----------

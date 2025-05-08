@@ -172,13 +172,14 @@ public class browseMetadataTreeBuilder {
             return null;
         }
 
+
         String nodeName = node.getValue();
         if (nodeName.startsWith("gml:")) {
             nodeName = nodeName.substring(4);
         }
 
         if (nodeName.equals("name")) {
-            nodeName = "ESPG";
+            nodeName = "EPSG";
         }
 
 

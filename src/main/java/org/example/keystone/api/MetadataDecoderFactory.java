@@ -1,6 +1,7 @@
 package org.example.keystone.api;
 
 import org.gdal.gdal.Dataset;
+import org.gdal.gdal.Driver;
 import org.gdal.gdal.gdal;
 import org.gdal.gdalconst.gdalconstConstants;
 
@@ -12,19 +13,21 @@ public class MetadataDecoderFactory {
         /*
             Factory class for creating new MetadataDecoder objects based on file type
          */
-        String fileType = getFileExtension(file);
 
-        if (fileType == null) {
-            throw new IllegalArgumentException("File type cannot be null");
-        }
+        String driverName = getDriverName(file);
 
-        return switch (fileType) {
-            case "tif", "TIF" -> new TiffDecoder(file, getDataset(file, true));
-            case "ntf" -> new NitfDecoder(file, getDataset(file, true));
-            case "jpg", "jpeg" -> new JpegDecoder(file, getDataset(file, false));
-            case "png" -> null;
-            default -> throw new UnsupportedOperationException("Unsupported File Type: " + fileType);
+        return switch (driverName) {
+            case "GTiff" -> new TiffDecoder(file, getDataset(file, true));
+            case "NITF" -> new NitfDecoder(file, getDataset(file, true));
+            case "JPEG" -> new JpegDecoder(file, getDataset(file, false));
+            case "PNG" -> null;
+            default -> throw new UnsupportedOperationException("Unsupported File Type: " + driverName);
         };
+    }
+
+    public static String getDriverName(File file) {
+        Dataset dataset = gdal.Open(file.getAbsolutePath());
+        return dataset.GetDriver().getShortName();
     }
 
     public static String getFileExtension(File file) {

@@ -11,7 +11,7 @@ public class ImageFactory {
     private static MemoryBoundImageCache cache = new MemoryBoundImageCache(maxCacheCapacityInMB);
 
     public static Image getFXImage(File file) {
-        String fileExtension = MetadataDecoderFactory.getFileExtension(file);
+        String fileExtension = MetadataDecoderFactory.getDriverName(file);
         System.out.println(maxCacheCapacityInMB);
 
         if (fileExtension == null) {
@@ -19,7 +19,7 @@ public class ImageFactory {
         }
 
         return switch (fileExtension) {
-            case "jpg", "jpeg", "png", "tif", "TIF", "ntf" -> {
+            case "JPEG", "PNG", "GTiff", "NITF" -> {
                 System.out.println(ImageProcessor.isLargeImage(file));
                 if (ImageProcessor.isLargeImage(file)) {
 
